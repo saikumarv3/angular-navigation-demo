@@ -2,17 +2,17 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PAGES, Page } from '../page.data';
 import { PageContentComponent } from './page-content/page-content.component';
-import { ErrorBarComponent } from './error-bar/error-bar.component';
+import { AlertBarComponent } from './alert-bar/alert-bar.component';
 
 @Component({
   selector: 'app-page',
   standalone: true,
-  imports: [PageContentComponent, ErrorBarComponent],
+  imports: [PageContentComponent, AlertBarComponent],
   template: `
-    <app-error-bar
+    <app-alert-bar
       [show]="showBackError"
       [messages]="['Back navigation is not allowed']">
-    </app-error-bar>
+    </app-alert-bar>
     <app-page-content
       [title]="title"
       [currentPageData]="currentPageData"
