@@ -1,17 +1,21 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { delay } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LanService {
+  private shouldFail = false; // Set this to true to make LAN check fail
+
+  setShouldFail(value: boolean) {
+    this.shouldFail = value;
+  }
+
   checkLan(): Observable<boolean> {
-    // Randomly return success or error for demonstration
-    const isSuccess = Math.random() > 0.5;
-    
-    return of(isSuccess).pipe(
-      delay(1) // Reduced from 1000ms to 300ms for faster response
-    );
+    if (this.shouldFail) {
+      return of(false).pipe(delay(1));
+    }
+    return of(true).pipe(delay(1));
   }
 } 
