@@ -18,6 +18,17 @@
                   {{option}}
                 </label>
               </div>
+              <div *ngIf="question.type === 'dropdown'" class="dropdown-container">
+                <select [id]="question.id"
+                        [(ngModel)]="answers[question.id]"
+                        (blur)="onBlur.emit(question.id)"
+                        class="dropdown-select">
+                  <option value="">Select an option</option>
+                  <option *ngFor="let option of question.options" [value]="option">
+                    {{option}}
+                  </option>
+                </select>
+              </div>
               <div *ngIf="question.type === 'text'" class="text-input">
                 <input type="text" 
                        [id]="question.id"

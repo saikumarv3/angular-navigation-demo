@@ -1,7 +1,7 @@
 export interface Question {
   id: string;
   text: string;
-  type: 'radio' | 'text' | 'checkbox';
+  type: 'radio' | 'text' | 'checkbox' | 'dropdown';
   required?: boolean;
   options?: string[];
   errorMessage?: string;
@@ -28,6 +28,20 @@ export const PAGES: Page[] = [
         id: 'renewal-details',
         title: 'Renewal details',
         questions: [
+            {
+                id: 'product-type',
+                text: 'Which product would you like to purchase?',
+                type: 'dropdown',
+                required: true,
+                options: ['Laptop', 'Phone', 'Home']
+              },
+              {
+                id: 'purchase-state',
+                text: 'State of residence to buy',
+                type: 'dropdown',
+                required: true,
+                options: ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming', 'District of Columbia', 'Puerto Rico', 'U.S. Virgin Islands']
+              },
           {
             id: 'full-renewal',
             text: 'Is this a renewal of the full contract?',
