@@ -6,7 +6,7 @@ import { delay } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class LanService {
-  private shouldFail = true; // Set this to true to make LAN check fail
+  private shouldFail = false; // Set this to true to make LAN check fail
 
   setShouldFail(value: boolean) {
     this.shouldFail = value;
