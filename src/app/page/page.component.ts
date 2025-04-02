@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { PAGES, Page } from '../page.data';
+import { PAGES, Page } from './../page.data';
+import { LanService } from '../services/lan.service';
 import { PageContentComponent } from './page-content/page-content.component';
 import { AlertBarComponent } from './alert-bar/alert-bar.component';
 
@@ -16,12 +17,12 @@ import { AlertBarComponent } from './alert-bar/alert-bar.component';
     <app-page-content
       [title]="title"
       [currentPageData]="currentPageData"
-      [hasNext]="hasNext()"
+      [hasNext]="hasNext"
       [isFormValid]="true"
       [answers]="answers"
       [touched]="touched"
       [showValidationErrors]="showValidationErrors"
-      (next)="next()"
+      (next)="onNext()"
       (back)="onBack()"
       (onBlur)="onBlur($event)">
     </app-page-content>
@@ -35,39 +36,67 @@ export class PageComponent implements OnInit {
   touched: { [key: string]: boolean } = {};
   showBackError = false;
   showValidationErrors = false;
+  showLanError = false;
+  isCheckingLan = false;
 
-  constructor(private route: ActivatedRoute, private router: Router) {}
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private lanService: LanService
+  ) {}
 
   ngOnInit() {
     this.route.params.subscribe(params => {
       const pageId = params['title'];
-      const pageIndex = PAGES.findIndex(page => page.id === pageId);
-      if (pageIndex !== -1) {
-        this.currentPage = pageIndex;
-        this.currentPageData = PAGES[pageIndex];
+      this.currentPageData = PAGES.find(page => page.id === pageId) || null;
+      if (this.currentPageData) {
         this.title = this.currentPageData.title;
       } else {
         this.title = 'Not Found';
-        this.currentPageData = null;
       }
     });
   }
 
-  hasNext() { 
-    return this.currentPage < PAGES.length - 1; 
+  get hasNext(): boolean {
+    if (!this.currentPageData) return false;
+    const currentIndex = PAGES.findIndex(page => page.id === this.currentPageData?.id);
+    return currentIndex < PAGES.length - 1;
   }
 
-  next() { 
-    if (!this.isFormValid()) {
-      this.showValidationErrors = true;
-      return;
-    }
+  get nextPageId(): string | null {
+    if (!this.currentPageData) return null;
+    const currentIndex = PAGES.findIndex(page => page.id === this.currentPageData?.id);
+    return PAGES[currentIndex + 1]?.id || null;
+  }
 
-    if (this.currentPage === PAGES.length - 1) {
-      this.router.navigate(['/success']);
+  onNext() {
+    if (this.currentPageData?.id === 'product-selection') {
+      this.isCheckingLan = true;
+      this.showLanError = false;
+      
+      this.lanService.checkLan().subscribe({
+        next: (success) => {
+          this.isCheckingLan = false;
+          if (success) {
+            this.navigateToNextPage();
+          } else {
+            this.showLanError = true;
+          }
+        },
+        error: () => {
+          this.isCheckingLan = false;
+          this.showLanError = true;
+        }
+      });
     } else {
-      const nextPage = PAGES[this.currentPage + 1];
-      this.router.navigate(['/page', nextPage.id]);
+      this.navigateToNextPage();
+    }
+  }
+
+  private navigateToNextPage() {
+    const nextPageId = this.nextPageId;
+    if (nextPageId) {
+      this.router.navigate(['/page', nextPageId]);
     }
   }
 
@@ -88,7 +117,8 @@ export class PageComponent implements OnInit {
     );
   }
 
-  onBlur(questionId: string) {
-    this.touched[questionId] = true;
+  onBlur(fieldId: string) {
+    this.touched[fieldId] = true;
+    this.showValidationErrors = true;
   }
 }

@@ -1,0 +1,25 @@
+<div class="page-container">
+  <app-alert-bar 
+    *ngIf="showLanError"
+    [show]="true"
+    [messages]="['LAN check failed. Please try again.']">
+  </app-alert-bar>
+  
+  <app-page-content
+    [title]="title"
+    [currentPageData]="currentPageData"
+    [hasNext]="hasNext"
+    [isFormValid]="true"
+    [answers]="answers"
+    [touched]="touched"
+    [showValidationErrors]="showValidationErrors"
+    (next)="onNext()"
+    (back)="onBack()"
+    (onBlur)="onBlur($event)">
+  </app-page-content>
+
+  <div *ngIf="isCheckingLan" class="loading-overlay">
+    <div class="loading-spinner"></div>
+    <p>Checking LAN status...</p>
+  </div>
+</div> 
