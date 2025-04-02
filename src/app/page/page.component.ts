@@ -1,13 +1,14 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgIf } from '@angular/common';
-import { PAGES } from './../page.data';
+import { PAGES } from '../page.data';
 
 @Component({
   selector: 'app-page',
   standalone: true,
   imports: [NgIf],
-  template: `<h2>{{title}}</h2><button *ngIf="hasNext()" (click)="next()">Next</button>`
+  templateUrl: './page.component.html',
+  styleUrls: ['./page.component.scss']
 })
 export class PageComponent {
   title = '';

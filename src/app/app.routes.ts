@@ -4,7 +4,8 @@ import { PageComponent } from './page/page.component';
 import { SuccessComponent } from './success/success.component';
 
 export const routes: Routes = [
-  { path: '', component: WelcomeComponent },
+  { path: '', redirectTo: 'welcome', pathMatch: 'full' },
+  { path: 'welcome', component: WelcomeComponent },
   { path: 'page/:title', component: PageComponent },
   { path: 'success', component: SuccessComponent }
 ];
