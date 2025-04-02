@@ -14,6 +14,10 @@ import { AlertBarComponent } from './alert-bar/alert-bar.component';
       [show]="showBackError"
       [messages]="['Back navigation is not allowed']">
     </app-alert-bar>
+    <app-alert-bar
+      [show]="showLanError"
+      [messages]="['LAN check failed. Please try again.']">
+    </app-alert-bar>
     <app-page-content
       [title]="title"
       [currentPageData]="currentPageData"
