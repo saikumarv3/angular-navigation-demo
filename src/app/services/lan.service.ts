@@ -11,7 +11,7 @@ export class LanService {
     const isSuccess = Math.random() > 0.5;
     
     return of(isSuccess).pipe(
-      delay(1000) // Simulate network delay
+      delay(1) // Reduced from 1000ms to 300ms for faster response
     );
   }
 } 
