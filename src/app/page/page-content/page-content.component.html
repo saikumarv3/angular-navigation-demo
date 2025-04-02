@@ -1,0 +1,58 @@
+<div class="page-container">
+  <div class="page-content">
+    <h2 class="page-title">{{title}}</h2>
+    <div class="page-body">
+      <div *ngIf="currentPageData && currentPageData.cards" class="cards-container">
+        <div *ngFor="let card of currentPageData.cards" class="card">
+          <h3 class="card-title">{{card.title}}</h3>
+          <div class="questions-container">
+            <div *ngFor="let question of card.questions" class="question">
+              <p class="question-text">{{question.text}}</p>
+              <div class="options-container" *ngIf="question.type === 'radio'">
+                <label *ngFor="let option of question.options" class="radio-option">
+                  <input type="radio" 
+                         [name]="question.id" 
+                         [value]="option"
+                         [(ngModel)]="answers[question.id]"
+                         (blur)="onBlur.emit(question.id)">
+                  {{option}}
+                </label>
+              </div>
+              <div *ngIf="question.type === 'text'" class="text-input">
+                <input type="text" 
+                       [id]="question.id"
+                       [(ngModel)]="answers[question.id]"
+                       [placeholder]="question.text"
+                       (blur)="onBlur.emit(question.id)">
+              </div>
+              <div *ngIf="question.type === 'checkbox'" class="checkbox-container">
+                <label *ngFor="let option of question.options" class="checkbox-option">
+                  <input type="checkbox" 
+                         [name]="question.id" 
+                         [value]="option"
+                         [(ngModel)]="answers[question.id + '_' + option]"
+                         (blur)="onBlur.emit(question.id + '_' + option)">
+                  {{option}}
+                </label>
+              </div>
+              <div *ngIf="showError(question)" class="error-message">
+                This field is required
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="!currentPageData?.cards" class="no-cards-message">
+        <p>No form data available for this page.</p>
+      </div>
+    </div>
+    <div class="page-actions">
+      <button class="back-button" (click)="back.emit()">Back</button>
+      <button *ngIf="hasNext" 
+              class="next-button" 
+              (click)="next.emit()">
+        Next
+      </button>
+    </div>
+  </div>
+</div> 
