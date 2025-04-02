@@ -1,0 +1,10 @@
+<div *ngIf="show" class="alert-bar">
+  <div class="alert-content">
+    <span class="alert-icon">⚠️</span>
+    <div class="alert-messages">
+      <div *ngFor="let msg of messages" class="alert-message">
+        {{msg}}
+      </div>
+    </div>
+  </div>
+</div> 
