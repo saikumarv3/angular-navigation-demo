@@ -11,13 +11,13 @@ import { ErrorBarComponent } from './error-bar/error-bar.component';
   template: `
     <app-error-bar
       [show]="showBackError"
-      message="Back navigation is not allowed">
+      [messages]="['Back navigation is not allowed']">
     </app-error-bar>
     <app-page-content
       [title]="title"
       [currentPageData]="currentPageData"
       [hasNext]="hasNext()"
-      [isFormValid]="isFormValid()"
+      [isFormValid]="true"
       [answers]="answers"
       [touched]="touched"
       [showValidationErrors]="showValidationErrors"

@@ -1,15 +1,19 @@
 import { Component, Input } from '@angular/core';
-import { NgIf } from '@angular/common';
+import { NgIf, NgFor } from '@angular/common';
 
 @Component({
   selector: 'app-error-bar',
   standalone: true,
-  imports: [NgIf],
+  imports: [NgIf, NgFor],
   template: `
     <div *ngIf="show" class="error-bar">
       <div class="error-content">
         <span class="error-icon">⚠️</span>
-        <span class="error-message">{{message}}</span>
+        <div class="error-messages">
+          <div *ngFor="let msg of messages" class="error-message">
+            {{msg}}
+          </div>
+        </div>
       </div>
     </div>
   `,
@@ -25,12 +29,19 @@ import { NgIf } from '@angular/common';
 
     .error-content {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       gap: 0.5rem;
     }
 
     .error-icon {
       font-size: 1.2rem;
+      margin-top: 0.2rem;
+    }
+
+    .error-messages {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
     }
 
     .error-message {
@@ -41,5 +52,5 @@ import { NgIf } from '@angular/common';
 })
 export class ErrorBarComponent {
   @Input() show = false;
-  @Input() message = '';
+  @Input() messages: string[] = [];
 } 
