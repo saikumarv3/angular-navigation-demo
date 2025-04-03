@@ -78,7 +78,23 @@ export const PAGES: Page[] = [
       }
     ]
   },
-  { id: 'advisor-terms', title: 'Advisor Terms' },
-  { id: 'checkout', title: 'Checkout' },
-  { id: 'address-info', title: 'Address Info' }
+  { id: 'advisor-terms',
+    title: 'Advisor Terms',
+    cards: [
+      {
+        id: 'advisor-terms',
+        title: 'Advisor Terms',
+        questions: [
+          {
+            id: 'advisor-terms',
+            text: 'Advisor Terms',
+            type: 'radio',
+            required: true,
+            options: ['Yes', 'No'],
+            errorMessage: 'Please select whether the advisor terms have been accepted'
+          }
+        ]
+      }
+    ]
+  },
 ]; 

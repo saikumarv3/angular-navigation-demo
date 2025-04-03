@@ -1,11 +1,6 @@
 <div class="navigation-buttons">
   <button class="back-button" (click)="back.emit()">Back</button>
-  <button *ngIf="hasNext" 
-          class="next-button" 
-          [disabled]="!isFormValid"
-          (click)="next.emit()">
-    Next
-  </button>
+  <button class="next-button" (click)="next.emit()">Next</button>
   <button class="exit-button" (click)="onExit()">Exit</button>
 </div>
 
