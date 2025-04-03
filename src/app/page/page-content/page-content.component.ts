@@ -1,36 +1,29 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { NgIf, NgFor } from '@angular/common';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Page, Question } from '../../page.data';
+import { NavigationButtonsComponent } from '../navigation-buttons/navigation-buttons.component';
+import { Page } from '../../page.data';
 
 @Component({
   selector: 'app-page-content',
   standalone: true,
-  imports: [NgIf, NgFor, FormsModule],
+  imports: [CommonModule, FormsModule, NavigationButtonsComponent],
   templateUrl: './page-content.component.html',
   styleUrls: ['./page-content.component.scss']
 })
 export class PageContentComponent {
-  @Input() title = '';
+  @Input() title: string = '';
   @Input() currentPageData: Page | null = null;
-  @Input() hasNext = false;
-  @Input() isFormValid = false;
   @Input() answers: { [key: string]: string } = {};
-  @Input() touched: { [key: string]: boolean } = {};
-  @Input() showValidationErrors = false;
+  @Input() hasNext: boolean = false;
+  @Input() isFormValid: boolean = true;
+  @Input() validationErrors: { [key: string]: boolean } = {};
 
   @Output() next = new EventEmitter<void>();
   @Output() back = new EventEmitter<void>();
   @Output() onBlur = new EventEmitter<string>();
 
-  ngOnInit() {
-    debugger
-    console.log('in child component answers', this.answers);
-  }
-
-  showError(question: Question): boolean {
-    return (this.showValidationErrors || this.touched[question.id]) && 
-           (question.required ?? true) && 
-           !this.answers[question.id];
+  showError(question: any): boolean {
+    return this.validationErrors[question.id] || false;
   }
 } 

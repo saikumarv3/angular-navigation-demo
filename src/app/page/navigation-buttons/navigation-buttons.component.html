@@ -1,0 +1,11 @@
+<div class="navigation-buttons">
+  <button (click)="back.emit()" class="back-button">
+    Back
+  </button>
+  <button 
+    (click)="next.emit()" 
+    [disabled]="!hasNext || !isFormValid" 
+    class="next-button">
+    Next
+  </button>
+</div> 

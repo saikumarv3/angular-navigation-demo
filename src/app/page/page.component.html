@@ -1,18 +1,23 @@
 <div class="page-container">
   <app-alert-bar 
+    *ngIf="showBackError"
+    [show]="true"
+    [messages]="['Back navigation is not allowed']">
+  </app-alert-bar>
+
+  <app-alert-bar 
     *ngIf="showLanError"
     [show]="true"
     [messages]="['LAN check failed. Please try again.']">
   </app-alert-bar>
   
   <app-page-content
-    [title]="title"
+    [title]="currentPageData?.title || ''"
     [currentPageData]="currentPageData"
-    [hasNext]="hasNext"
-    [isFormValid]="true"
     [answers]="answers"
-    [touched]="touched"
-    [showValidationErrors]="showValidationErrors"
+    [hasNext]="hasNext"
+    [isFormValid]="isFormValid"
+    [validationErrors]="validationErrors"
     (next)="onNext()"
     (back)="onBack()"
     (onBlur)="onBlur($event)">

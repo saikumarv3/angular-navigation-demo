@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PAGES, Page } from './../page.data';
 import { LanService } from '../services/lan.service';
@@ -9,38 +10,15 @@ import { AlertBarComponent } from './alert-bar/alert-bar.component';
 @Component({
   selector: 'app-page',
   standalone: true,
-  imports: [PageContentComponent, AlertBarComponent],
-  template: `
-    <app-alert-bar
-      [show]="showBackError"
-      [messages]="['Back navigation is not allowed']">
-    </app-alert-bar>
-    <app-alert-bar
-      [show]="showLanError"
-      [messages]="['LAN check failed. Please try again.']">
-    </app-alert-bar>
-    <app-page-content
-      [title]="title"
-      [currentPageData]="currentPageData"
-      [hasNext]="hasNext"
-      [isFormValid]="true"
-      [answers]="answers"
-      [touched]="touched"
-      [showValidationErrors]="showValidationErrors"
-      (next)="onNext()"
-      (back)="onBack()"
-      (onBlur)="onBlur($event)">
-    </app-page-content>
-  `
+  imports: [CommonModule, PageContentComponent, AlertBarComponent],
+  templateUrl: './page.component.html',
+  styleUrls: ['./page.component.scss']
 })
 export class PageComponent implements OnInit {
-  title = '';
-  currentPage = 0;
   currentPageData: Page | null = null;
   answers: { [key: string]: string } = {};
-  touched: { [key: string]: boolean } = {};
+  validationErrors: { [key: string]: boolean } = {};
   showBackError = false;
-  showValidationErrors = false;
   showLanError = false;
   isCheckingLan = false;
   isPrefillMode = false;
@@ -58,13 +36,8 @@ export class PageComponent implements OnInit {
       this.isPrefillMode = this.router.url.includes('/prefill');
       this.currentPageData = PAGES.find(page => page.id === pageId) || null;
       
-      if (this.currentPageData) {
-        this.title = this.currentPageData.title;
-        if (this.isPrefillMode) {
-          this.answers = this.prefillService.getAnswers();
-        }
-      } else {
-        this.title = 'Not Found';
+      if (this.isPrefillMode) {
+        this.answers = this.prefillService.getAnswers();
       }
     });
   }
@@ -122,18 +95,30 @@ export class PageComponent implements OnInit {
     }, 3000);
   }
 
-  isFormValid(): boolean {
+  get isFormValid(): boolean {
     if (!this.currentPageData?.cards) return true;
     
     return this.currentPageData.cards.every(card => 
-      card.questions.every(question => 
-        !question.required || this.answers[question.id]
-      )
+      card.questions.every(question => {
+        if (!question.required) return true;
+        const hasAnswer = !!this.answers[question.id];
+        if (!hasAnswer) {
+          this.validationErrors[question.id] = true;
+        }
+        return hasAnswer;
+      })
     );
   }
 
-  onBlur(fieldId: string) {
-    this.touched[fieldId] = true;
-    this.showValidationErrors = true;
+  onBlur(questionId: string) {
+    if (this.currentPageData?.cards) {
+      const question = this.currentPageData.cards
+        .flatMap(card => card.questions)
+        .find(q => q.id === questionId);
+      
+      if (question?.required) {
+        this.validationErrors[questionId] = !this.answers[questionId];
+      }
+    }
   }
 }
