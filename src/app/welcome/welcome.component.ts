@@ -85,7 +85,6 @@ export class WelcomeComponent {
   }
 
   startWithPrefill() {
-    // Answers are already initialized in the service
-    this.router.navigate(['/page', 'product-selection']);
+    this.router.navigate(['/page', 'product-selection', 'prefill']);
   }
 }

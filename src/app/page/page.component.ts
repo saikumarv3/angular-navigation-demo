@@ -43,6 +43,7 @@ export class PageComponent implements OnInit {
   showValidationErrors = false;
   showLanError = false;
   isCheckingLan = false;
+  isPrefillMode = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -54,12 +55,14 @@ export class PageComponent implements OnInit {
   ngOnInit() {
     this.route.params.subscribe(params => {
       const pageId = params['title'];
+      this.isPrefillMode = this.router.url.includes('/prefill');
       this.currentPageData = PAGES.find(page => page.id === pageId) || null;
+      
       if (this.currentPageData) {
         this.title = this.currentPageData.title;
-        debugger
-        // Initialize answers from prefill service
-        this.answers = this.prefillService.getAnswers();
+        if (this.isPrefillMode) {
+          this.answers = this.prefillService.getAnswers();
+        }
       } else {
         this.title = 'Not Found';
       }
@@ -105,7 +108,10 @@ export class PageComponent implements OnInit {
   private navigateToNextPage() {
     const nextPageId = this.nextPageId;
     if (nextPageId) {
-      this.router.navigate(['/page', nextPageId]);
+      const route = this.isPrefillMode 
+        ? ['/page', nextPageId, 'prefill']
+        : ['/page', nextPageId];
+      this.router.navigate(route);
     }
   }
 
