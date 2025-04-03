@@ -78,7 +78,8 @@ export const PAGES: Page[] = [
       }
     ]
   },
-  { id: 'advisor-terms',
+  { 
+    id: 'advisor-terms',
     title: 'Advisor Terms',
     cards: [
       {
@@ -97,4 +98,6 @@ export const PAGES: Page[] = [
       }
     ]
   },
+  { id: 'checkout', title: 'Checkout' },
+  { id: 'address-info', title: 'Address Info' }
 ]; 
