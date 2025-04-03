@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PAGES, Page } from './../page.data';
 import { LanService } from '../services/lan.service';
+import { PrefillService } from '../services/prefill.service';
 import { PageContentComponent } from './page-content/page-content.component';
 import { AlertBarComponent } from './alert-bar/alert-bar.component';
 
@@ -46,7 +47,8 @@ export class PageComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private lanService: LanService
+    private lanService: LanService,
+    private prefillService: PrefillService
   ) {}
 
   ngOnInit() {
@@ -55,6 +57,9 @@ export class PageComponent implements OnInit {
       this.currentPageData = PAGES.find(page => page.id === pageId) || null;
       if (this.currentPageData) {
         this.title = this.currentPageData.title;
+        debugger
+        // Initialize answers from prefill service
+        this.answers = this.prefillService.getAnswers();
       } else {
         this.title = 'Not Found';
       }

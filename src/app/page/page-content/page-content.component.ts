@@ -23,6 +23,11 @@ export class PageContentComponent {
   @Output() back = new EventEmitter<void>();
   @Output() onBlur = new EventEmitter<string>();
 
+  ngOnInit() {
+    debugger
+    console.log('in child component answers', this.answers);
+  }
+
   showError(question: Question): boolean {
     return (this.showValidationErrors || this.touched[question.id]) && 
            (question.required ?? true) && 
