@@ -85,6 +85,8 @@ export class PageComponent implements OnInit {
         ? ['/page', nextPageId, 'prefill']
         : ['/page', nextPageId];
       this.router.navigate(route);
+      // Scroll to top of the page
+      window.scrollTo(0, 0);
     }
   }
 
