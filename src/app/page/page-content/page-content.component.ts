@@ -22,8 +22,14 @@ export class PageContentComponent {
   @Output() next = new EventEmitter<void>();
   @Output() back = new EventEmitter<void>();
   @Output() onBlur = new EventEmitter<string>();
+  @Output() exit = new EventEmitter<void>();
 
   showError(question: any): boolean {
     return this.validationErrors[question.id] || false;
+  }
+
+  onExit() {
+    console.log('PageContentComponent: Exit event received');
+    this.exit.emit();
   }
 } 

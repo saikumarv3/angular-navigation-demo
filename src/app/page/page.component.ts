@@ -95,6 +95,11 @@ export class PageComponent implements OnInit {
     }, 3000);
   }
 
+  onExit() {
+    console.log('PageComponent: Exit event received, navigating to welcome');
+    this.router.navigate(['/welcome']);
+  }
+
   get isFormValid(): boolean {
     if (!this.currentPageData?.cards) return true;
     

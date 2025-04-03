@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Routes } from '@angular/router';
 import { WelcomeComponent } from './welcome/welcome.component';
 import { PageComponent } from './page/page.component';
 
@@ -14,8 +14,9 @@ export class AppComponent {
   title = 'angular-navigation-demo';
 }
 
-export const routes = [
-  { path: '', component: WelcomeComponent },
+export const routes: Routes = [
+  { path: '', redirectTo: 'welcome', pathMatch: 'full' },
+  { path: 'welcome', component: WelcomeComponent },
   { path: 'page/:title', component: PageComponent },
   { path: 'page/:title/prefill', component: PageComponent }
 ];

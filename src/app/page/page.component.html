@@ -20,7 +20,8 @@
     [validationErrors]="validationErrors"
     (next)="onNext()"
     (back)="onBack()"
-    (onBlur)="onBlur($event)">
+    (onBlur)="onBlur($event)"
+    (exit)="onExit()">
   </app-page-content>
 
   <div *ngIf="isCheckingLan" class="loading-overlay">

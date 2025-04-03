@@ -58,11 +58,12 @@
         </div>
       </ng-template>
     </div>
+    <app-navigation-buttons
+      [hasNext]="hasNext"
+      [isFormValid]="isFormValid"
+      (next)="next.emit()"
+      (back)="back.emit()"
+      (exit)="onExit()">
+    </app-navigation-buttons>
   </div>
-  <app-navigation-buttons
-  [hasNext]="hasNext"
-  [isFormValid]="isFormValid"
-  (next)="next.emit()"
-  (back)="back.emit()">
-</app-navigation-buttons>
 </div> 

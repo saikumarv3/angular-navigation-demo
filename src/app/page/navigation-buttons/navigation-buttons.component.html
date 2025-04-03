@@ -1,11 +1,16 @@
 <div class="navigation-buttons">
-  <button (click)="back.emit()" class="back-button">
-    Back
-  </button>
-  <button 
-    (click)="next.emit()" 
-    [disabled]="!hasNext || !isFormValid" 
-    class="next-button">
+  <button class="back-button" (click)="back.emit()">Back</button>
+  <button *ngIf="hasNext" 
+          class="next-button" 
+          [disabled]="!isFormValid"
+          (click)="next.emit()">
     Next
   </button>
-</div> 
+  <button class="exit-button" (click)="onExit()">Exit</button>
+</div>
+
+<app-confirmation-dialog
+  *ngIf="showExitDialog"
+  (confirm)="onExitConfirmed()"
+  (cancel)="onExitCancelled()">
+</app-confirmation-dialog> 
