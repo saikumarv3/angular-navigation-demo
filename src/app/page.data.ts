@@ -5,6 +5,7 @@ export interface Question {
   required?: boolean;
   options?: string[];
   errorMessage?: string;
+  answer?: string | string[];
 }
 
 export interface Card {

@@ -118,14 +118,11 @@ export class PageComponent implements OnInit {
   }
 
   onBlur(questionId: string) {
-    if (this.currentPageData?.cards) {
-      const question = this.currentPageData.cards
-        .flatMap(card => card.questions)
-        .find(q => q.id === questionId);
-      
-      if (question?.required) {
-        this.validationErrors[questionId] = !this.answers[questionId];
-      }
+    const question = this.currentPageData?.cards?.flatMap(card => card.questions)
+      .find(q => q.id === questionId);
+
+    if (question?.required) {
+      this.validationErrors[questionId] = !this.answers[questionId];
     }
   }
 }
