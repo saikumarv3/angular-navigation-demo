@@ -10,6 +10,12 @@
     [show]="true"
     [messages]="['LAN check failed. Please try again.']">
   </app-alert-bar>
+
+  <app-alert-bar 
+    *ngIf="crossOverMessages.length > 0"
+    [show]="true"
+    [messages]="crossOverMessages">
+  </app-alert-bar>
   
   <app-page-content
     [title]="currentPageData?.title || ''"
@@ -21,6 +27,7 @@
     (next)="onNext()"
     (back)="onBack()"
     (blur)="onBlur($event)"
+    (answerChange)="onAnswerChange($event)"
     (exit)="onExit()">
   </app-page-content>
 

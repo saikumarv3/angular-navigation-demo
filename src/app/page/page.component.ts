@@ -1,33 +1,39 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { PAGES, Page } from './../page.data';
 import { LanService } from '../services/lan.service';
 import { PrefillService } from '../services/prefill.service';
 import { PageContentComponent } from './page-content/page-content.component';
 import { AlertBarComponent } from './alert-bar/alert-bar.component';
+import { CrossOverValidationService } from '../services/cross-over-validation.service';
 
 @Component({
   selector: 'app-page',
   standalone: true,
-  imports: [CommonModule, PageContentComponent, AlertBarComponent],
+  imports: [CommonModule, FormsModule, PageContentComponent, AlertBarComponent],
+  providers: [CrossOverValidationService],
   templateUrl: './page.component.html',
   styleUrls: ['./page.component.scss']
 })
-export class PageComponent implements OnInit {
+export class PageComponent implements OnInit, OnDestroy {
   currentPageData: Page | null = null;
-  answers: { [key: string]: string } = {};
+  answers: { [key: string]: string | string[] } = {};
   validationErrors: { [key: string]: boolean } = {};
   showBackError = false;
   showLanError = false;
   isCheckingLan = false;
   isPrefillMode = false;
+  crossOverMessages: string[] = [];
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private lanService: LanService,
-    private prefillService: PrefillService
+    private prefillService: PrefillService,
+    private crossOverValidationService: CrossOverValidationService
   ) {}
 
   ngOnInit() {
@@ -102,19 +108,33 @@ export class PageComponent implements OnInit {
     this.router.navigate(['/welcome']);
   }
 
+  onAnswerChange(event: { questionId: string, answer: string | string[] }) {
+    this.answers[event.questionId] = event.answer;
+    this.checkCrossOverValidation();
+  }
+
+  private checkCrossOverValidation() {
+    this.crossOverValidationService.checkCrossOverValidation(this.answers)
+      .subscribe((messages: string[]) => {
+        this.crossOverMessages = messages;
+      });
+  }
+
   get isFormValid(): boolean {
     if (!this.currentPageData?.cards) return true;
     
-    return this.currentPageData.cards.every(card => 
-      card.questions.every(question => {
-        if (!question.required) return true;
+    const hasValidationErrors = this.currentPageData.cards.some(card => 
+      card.questions.some(question => {
+        if (!question.required) return false;
         const hasAnswer = !!this.answers[question.id];
         if (!hasAnswer) {
           this.validationErrors[question.id] = true;
         }
-        return hasAnswer;
+        return !hasAnswer;
       })
     );
+
+    return !hasValidationErrors && this.crossOverMessages.length === 0;
   }
 
   onBlur(questionId: string) {
@@ -124,5 +144,9 @@ export class PageComponent implements OnInit {
     if (question?.required) {
       this.validationErrors[questionId] = !this.answers[questionId];
     }
+  }
+
+  ngOnDestroy() {
+    // Cleanup code if needed
   }
 }
