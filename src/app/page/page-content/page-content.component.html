@@ -28,8 +28,8 @@
                                [name]="'radio-' + question.id"
                                [id]="'radio-' + card.id + '-' + question.id + '-' + optionIndex"
                                [value]="option"
-                               [checked]="getAnswer(question.id) === option"
-                               (change)="onAnswerChange(question.id, option)">
+                               [(ngModel)]="answers[question.id]"
+                               (ngModelChange)="onAnswerChange(question.id, $event)">
                         {{ option }}
                       </label>
                     </div>
