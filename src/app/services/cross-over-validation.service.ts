@@ -24,8 +24,30 @@ export class CrossOverValidationService {
         { questionId: 'full-renewal', operator: 'equals', value: 'No' }
       ],
       message: 'Laptop products require full renewal. Please select Yes for full renewal.'
+    },
+    {
+      id: 'home-restricted-states',
+      conditions: [
+        { questionId: 'product-type', operator: 'equals', value: 'Home' },
+        { 
+          questionId: 'states', 
+          operator: 'contains', 
+          value: [
+            'California',
+            'New York',
+            'Texas',
+            'Florida',
+            'Illinois',
+            'Pennsylvania',
+            'Ohio',
+            'Georgia',
+            'North Carolina',
+            'Michigan'
+          ]
+        }
+      ],
+      message: 'Home products are not available in California, New York, Texas, Florida, Illinois, Pennsylvania, Ohio, Georgia, North Carolina, and Michigan. Please select a different product or state.'
     }
-    // Add more rules as needed
   ];
 
   constructor() {}
@@ -52,8 +74,18 @@ export class CrossOverValidationService {
               case 'notEquals':
                 return answer !== condition.value;
               case 'contains':
+                if (Array.isArray(condition.value)) {
+                  return Array.isArray(answer) 
+                    ? condition.value.some(v => answer.includes(v))
+                    : condition.value.includes(answer as string);
+                }
                 return Array.isArray(answer) ? answer.includes(condition.value as string) : false;
               case 'notContains':
+                if (Array.isArray(condition.value)) {
+                  return Array.isArray(answer)
+                    ? !condition.value.some(v => answer.includes(v))
+                    : !condition.value.includes(answer as string);
+                }
                 return Array.isArray(answer) ? !answer.includes(condition.value as string) : true;
               default:
                 return false;

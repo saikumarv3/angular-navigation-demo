@@ -27,6 +27,7 @@ export class PageComponent implements OnInit, OnDestroy {
   isCheckingLan = false;
   isPrefillMode = false;
   crossOverMessages: string[] = [];
+  hasAttemptedNext = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -61,6 +62,13 @@ export class PageComponent implements OnInit, OnDestroy {
   }
 
   onNext() {
+    this.hasAttemptedNext = true;
+    
+    // Check if form is valid before proceeding
+    if (!this.isFormValid) {
+      return; // Don't proceed if form is invalid
+    }
+
     if (this.currentPageData?.id === 'product-selection') {
       this.isCheckingLan = true;
       this.showLanError = false;
@@ -87,6 +95,11 @@ export class PageComponent implements OnInit, OnDestroy {
   private navigateToNextPage() {
     const nextPageId = this.nextPageId;
     if (nextPageId) {
+      // Reset validation state before navigating
+      this.hasAttemptedNext = false;
+      this.validationErrors = {};
+      this.crossOverMessages = [];
+      
       const route = this.isPrefillMode 
         ? ['/page', nextPageId, 'prefill']
         : ['/page', nextPageId];
@@ -123,26 +136,52 @@ export class PageComponent implements OnInit, OnDestroy {
   get isFormValid(): boolean {
     if (!this.currentPageData?.cards) return true;
     
-    const hasValidationErrors = this.currentPageData.cards.some(card => 
-      card.questions.some(question => {
-        if (!question.required) return false;
-        const hasAnswer = !!this.answers[question.id];
-        if (!hasAnswer) {
-          this.validationErrors[question.id] = true;
+    // Only show validation errors if user has attempted to go next
+    if (!this.hasAttemptedNext) {
+      return true;
+    }
+
+    let hasAnyValidationErrors = false;
+
+    // Check each card and its questions
+    this.currentPageData.cards.forEach(card => {
+      card.questions.forEach(question => {
+        if (question.required) {
+          const answer = this.answers[question.id];
+          const hasAnswer = answer !== undefined && answer !== null && answer !== '';
+          
+          // Set validation error for this question
+          this.validationErrors[question.id] = !hasAnswer;
+          
+          // Track if we have any validation errors
+          if (!hasAnswer) {
+            hasAnyValidationErrors = true;
+          }
         }
-        return !hasAnswer;
+      });
+    });
+
+    // Also check if all required questions have answers
+    const allRequiredQuestionsAnswered = this.currentPageData.cards.every(card =>
+      card.questions.every(question => {
+        if (!question.required) return true;
+        const answer = this.answers[question.id];
+        return answer !== undefined && answer !== null && answer !== '';
       })
     );
 
-    return !hasValidationErrors && this.crossOverMessages.length === 0;
+    return !hasAnyValidationErrors && this.crossOverMessages.length === 0 && allRequiredQuestionsAnswered;
   }
 
   onBlur(questionId: string) {
+    if (!this.hasAttemptedNext) return;
+
     const question = this.currentPageData?.cards?.flatMap(card => card.questions)
       .find(q => q.id === questionId);
 
     if (question?.required) {
-      this.validationErrors[questionId] = !this.answers[questionId];
+      const answer = this.answers[questionId];
+      this.validationErrors[questionId] = !answer || answer === '';
     }
   }
 
