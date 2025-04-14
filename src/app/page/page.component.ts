@@ -1,191 +1,110 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
-import { PAGES, Page } from './../page.data';
-import { LanService } from '../services/lan.service';
-import { PrefillService } from '../services/prefill.service';
+import { Router, ActivatedRoute } from '@angular/router';
 import { PageContentComponent } from './page-content/page-content.component';
+import { Page } from '../new-page-types';
+import { PAGES } from '../page.data';
 import { AlertBarComponent } from './alert-bar/alert-bar.component';
 import { CrossOverValidationService } from '../services/cross-over-validation.service';
 
 @Component({
   selector: 'app-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, PageContentComponent, AlertBarComponent],
-  providers: [CrossOverValidationService],
+  imports: [CommonModule, PageContentComponent, AlertBarComponent],
   templateUrl: './page.component.html',
   styleUrls: ['./page.component.scss']
 })
 export class PageComponent implements OnInit, OnDestroy {
-  currentPageData: Page | null = null;
+  currentPageIndex = 0;
+  currentPageData: Page = PAGES[0];
   answers: { [key: string]: string | string[] } = {};
-  validationErrors: { [key: string]: boolean } = {};
+  isFormValid = true;
+  validationErrors: { [key: string]: string | boolean } = {};
   showBackError = false;
   showLanError = false;
   isCheckingLan = false;
-  isPrefillMode = false;
   crossOverMessages: string[] = [];
   hasAttemptedNext = false;
+  PAGES = PAGES;
 
   constructor(
-    private route: ActivatedRoute,
     private router: Router,
-    private lanService: LanService,
-    private prefillService: PrefillService,
+    private route: ActivatedRoute,
     private crossOverValidationService: CrossOverValidationService
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.route.params.subscribe(params => {
       const pageId = params['title'];
-      this.isPrefillMode = this.router.url.includes('/prefill');
-      this.currentPageData = PAGES.find(page => page.id === pageId) || null;
-      
-      if (this.isPrefillMode) {
-        this.answers = this.prefillService.getAnswers();
+      const pageIndex = PAGES.findIndex((page: Page) => page.title === pageId);
+      if (pageIndex !== -1) {
+        this.currentPageIndex = pageIndex;
+        this.updatePageData();
       }
     });
   }
 
-  get hasNext(): boolean {
-    if (!this.currentPageData) return false;
-    const currentIndex = PAGES.findIndex(page => page.id === this.currentPageData?.id);
-    return currentIndex < PAGES.length - 1;
+  ngOnDestroy(): void {
+    // Cleanup if needed
   }
 
-  get nextPageId(): string | null {
-    if (!this.currentPageData) return null;
-    const currentIndex = PAGES.findIndex(page => page.id === this.currentPageData?.id);
-    return PAGES[currentIndex + 1]?.id || null;
+  updatePageData(): void {
+    this.currentPageData = PAGES[this.currentPageIndex];
+    this.validateForm();
   }
 
-  onNext() {
-    this.hasAttemptedNext = true;
-    
-    // Check if form is valid before proceeding
-    if (!this.isFormValid) {
-      return; // Don't proceed if form is invalid
-    }
-
-    if (this.currentPageData?.id === 'product-selection') {
-      this.isCheckingLan = true;
-      this.showLanError = false;
-      
-      this.lanService.checkLan().subscribe({
-        next: (success) => {
-          this.isCheckingLan = false;
-          if (success) {
-            this.navigateToNextPage();
-          } else {
-            this.showLanError = true;
-          }
-        },
-        error: () => {
-          this.isCheckingLan = false;
-          this.showLanError = true;
-        }
-      });
-    } else {
-      this.navigateToNextPage();
-    }
-  }
-
-  private navigateToNextPage() {
-    const nextPageId = this.nextPageId;
-    if (nextPageId) {
-      // Reset validation state before navigating
-      this.hasAttemptedNext = false;
-      this.validationErrors = {};
-      this.crossOverMessages = [];
-      
-      const route = this.isPrefillMode 
-        ? ['/page', nextPageId, 'prefill']
-        : ['/page', nextPageId];
-      this.router.navigate(route);
-      // Scroll to top of the page
-      window.scrollTo(0, 0);
-    }
-  }
-
-  onBack() {
-    this.showBackError = true;
-    setTimeout(() => {
-      this.showBackError = false;
-    }, 3000);
-  }
-
-  onExit() {
-    console.log('PageComponent: Exit event received, navigating to welcome');
-    this.router.navigate(['/welcome']);
-  }
-
-  onAnswerChange(event: { questionId: string, answer: string | string[] }) {
+  handleAnswerChange(event: { questionId: string; answer: string | string[] }): void {
     this.answers[event.questionId] = event.answer;
+    this.validateForm();
     this.checkCrossOverValidation();
   }
 
-  private checkCrossOverValidation() {
-    this.crossOverValidationService.checkCrossOverValidation(this.answers)
-      .subscribe((messages: string[]) => {
-        this.crossOverMessages = messages;
-      });
+  handleBlur(event: { questionId: string }): void {
+    this.validateForm();
   }
 
-  get isFormValid(): boolean {
-    if (!this.currentPageData?.cards) return true;
-    
-    // Only show validation errors if user has attempted to go next
-    if (!this.hasAttemptedNext) {
-      return true;
-    }
+  validateForm(): void {
+    this.validationErrors = {};
+    let isValid = true;
 
-    let hasAnyValidationErrors = false;
+    if (!this.currentPageData) return;
 
-    // Check each card and its questions
     this.currentPageData.cards.forEach(card => {
       card.questions.forEach(question => {
-        if (question.required) {
-          const answer = this.answers[question.id];
-          const hasAnswer = answer !== undefined && answer !== null && answer !== '';
-          
-          // Set validation error for this question
-          this.validationErrors[question.id] = !hasAnswer;
-          
-          // Track if we have any validation errors
-          if (!hasAnswer) {
-            hasAnyValidationErrors = true;
-          }
+        if (question.required && !this.answers[question.id]) {
+          this.validationErrors[question.id] = 'This field is required';
+          isValid = false;
         }
       });
     });
 
-    // Also check if all required questions have answers
-    const allRequiredQuestionsAnswered = this.currentPageData.cards.every(card =>
-      card.questions.every(question => {
-        if (!question.required) return true;
-        const answer = this.answers[question.id];
-        return answer !== undefined && answer !== null && answer !== '';
-      })
-    );
-
-    return !hasAnyValidationErrors && this.crossOverMessages.length === 0 && allRequiredQuestionsAnswered;
+    this.isFormValid = isValid;
   }
 
-  onBlur(questionId: string) {
-    if (!this.hasAttemptedNext) return;
-
-    const question = this.currentPageData?.cards?.flatMap(card => card.questions)
-      .find(q => q.id === questionId);
-
-    if (question?.required) {
-      const answer = this.answers[questionId];
-      this.validationErrors[questionId] = !answer || answer === '';
+  handleNext(): void {
+    if (this.currentPageIndex < PAGES.length - 1) {
+      this.currentPageIndex++;
+      this.updatePageData();
     }
   }
 
-  ngOnDestroy() {
-    // Cleanup code if needed
+  handleBack(): void {
+    if (this.currentPageIndex > 0) {
+      this.currentPageIndex--;
+      this.updatePageData();
+    }
+  }
+
+  handleExit(): void {
+    if (confirm('Are you sure you want to exit? All progress will be lost.')) {
+      this.router.navigate(['/']);
+    }
+  }
+
+  private checkCrossOverValidation(): void {
+    this.crossOverValidationService.checkCrossOverValidation(this.answers)
+      .subscribe((messages: string[]) => {
+        this.crossOverMessages = messages;
+      });
   }
 }

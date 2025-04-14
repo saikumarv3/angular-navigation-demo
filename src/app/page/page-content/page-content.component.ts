@@ -1,8 +1,8 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NavigationButtonsComponent } from '../navigation-buttons/navigation-buttons.component';
-import { Page, Question } from '../../page.data';
+import { Page, Card, Question, TextQuestion, EmailQuestion, TelQuestion, DateQuestion, DropdownQuestion, RadioQuestion, CheckboxQuestion } from '../../new-page-types';
 
 @Component({
   selector: 'app-page-content',
@@ -14,68 +14,81 @@ import { Page, Question } from '../../page.data';
 export class PageContentComponent {
   @Input() title: string = '';
   @Input() currentPageData: Page | null = null;
-  @Input() isFormValid = true;
-  @Input() hasNext = true;
-  @Input() validationErrors: { [key: string]: boolean } = {};
   @Input() answers: { [key: string]: string | string[] } = {};
+  @Input() isFormValid: boolean = true;
+  @Input() hasNext: boolean = true;
+  @Input() validationErrors: { [key: string]: string | boolean } = {};
   @Output() next = new EventEmitter<void>();
   @Output() back = new EventEmitter<void>();
   @Output() exit = new EventEmitter<void>();
-  @Output() answerChange = new EventEmitter<{ questionId: string, answer: string | string[] }>();
-  @Output() blur = new EventEmitter<string>();
+  @Output() answerChange = new EventEmitter<{ questionId: string; answer: string | string[] }>();
+  @Output() blur = new EventEmitter<{ questionId: string }>();
 
-  ngOnChanges() {
-    // Initialize empty answers for dropdown questions
-    if (this.currentPageData?.cards) {
-      this.currentPageData.cards.forEach(card => {
-        card.questions.forEach(question => {
-          if (question.type === 'dropdown' && !this.answers[question.id]) {
-            this.answers[question.id] = '';
-          }
-        });
-      });
-    }
+  onAnswerChange(questionId: string, value: string | string[]): void {
+    this.answers[questionId] = value;
+    this.answerChange.emit({ questionId, answer: value });
   }
 
-  onAnswerChange(questionId: string, value: string | Event) {
-    const answer = typeof value === 'string' ? value : (value.target as HTMLInputElement).value;
-    this.answerChange.emit({ questionId, answer });
+  onBlur(questionId: string): void {
+    this.blur.emit({ questionId });
   }
 
-  onCheckboxChange(questionId: string, option: string, event: any) {
-    const currentAnswers = (this.answers[questionId] as string[]) || [];
-    let newAnswers: string[];
-    
-    if (event) {
-      newAnswers = [...currentAnswers, option];
-    } else {
-      newAnswers = currentAnswers.filter(ans => ans !== option);
-    }
-    
-    this.answerChange.emit({ questionId, answer: newAnswers });
-  }
-
-  onBlur(questionId: string) {
-    this.blur.emit(questionId);
-  }
-
-  onExit() {
+  onExit(): void {
     this.exit.emit();
   }
 
   showError(question: Question): boolean {
-    return this.validationErrors[question.id] || false;
-  }
-
-  getAnswer(questionId: string): string | string[] | undefined {
-    return this.answers[questionId];
+    return !this.answers[question.id] && question.required;
   }
 
   isOptionSelected(questionId: string, option: string): boolean {
-    const answer = this.getAnswer(questionId);
-    if (Array.isArray(answer)) {
-      return answer.includes(option);
+    const answer = this.answers[questionId];
+    return Array.isArray(answer) ? answer.includes(option) : false;
+  }
+
+  onCheckboxChange(questionId: string, option: string, checked: boolean): void {
+    const currentAnswer = this.answers[questionId] || [];
+    const answerArray = Array.isArray(currentAnswer) ? [...currentAnswer] : [];
+    
+    if (checked) {
+      answerArray.push(option);
+    } else {
+      const index = answerArray.indexOf(option);
+      if (index > -1) {
+        answerArray.splice(index, 1);
+      }
     }
-    return answer === option;
+    
+    this.answers[questionId] = answerArray;
+    this.answerChange.emit({ questionId, answer: answerArray });
+  }
+
+  // Type guards
+  isTextQuestion(question: Question): question is TextQuestion {
+    return question.type === 'text';
+  }
+
+  isEmailQuestion(question: Question): question is EmailQuestion {
+    return question.type === 'email';
+  }
+
+  isTelQuestion(question: Question): question is TelQuestion {
+    return question.type === 'tel';
+  }
+
+  isDateQuestion(question: Question): question is DateQuestion {
+    return question.type === 'date';
+  }
+
+  isDropdownQuestion(question: Question): question is DropdownQuestion {
+    return question.type === 'dropdown';
+  }
+
+  isRadioQuestion(question: Question): question is RadioQuestion {
+    return question.type === 'radio';
+  }
+
+  isCheckboxQuestion(question: Question): question is CheckboxQuestion {
+    return question.type === 'checkbox';
   }
 } 

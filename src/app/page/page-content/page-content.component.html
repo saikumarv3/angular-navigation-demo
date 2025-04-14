@@ -1,89 +1,134 @@
 <div class="page-container" [id]="'page-container-' + currentPageData?.id">
   <div class="page-content" [id]="'page-content-' + currentPageData?.id">
-    <h1 class="page-title" [id]="'page-title-' + currentPageData?.id">{{title}}</h1>
+    <h1 class="page-title" [id]="'page-title-' + currentPageData?.id">{{currentPageData?.title}}</h1>
     <div class="page-body" [id]="'page-body-' + currentPageData?.id">
       <ng-container *ngIf="currentPageData?.cards; else noCards">
         <div class="cards-container" [id]="'cards-container-' + currentPageData?.id">
           <div *ngFor="let card of currentPageData!.cards; let cardIndex = index" 
                class="card" 
                [id]="'card-' + card.id">
-            <h2 class="card-title" [id]="'card-title-' + card.id">{{card.title}}</h2>
+            <h2 class="card-title" [id]="'card-title-' + card.id">{{card.heading}}</h2>
+            <p *ngIf="card.description" class="card-description" [id]="'card-description-' + card.id">{{card.description}}</p>
+
+            <ng-container *ngIf="card.subHeadings">
+              <div *ngFor="let subHeading of card.subHeadings" class="sub-heading" [id]="'sub-heading-' + subHeading.id">
+                <h3>{{subHeading.title}}</h3>
+                <p *ngIf="subHeading.description">{{subHeading.description}}</p>
+              </div>
+            </ng-container>
+
             <div class="questions-container" [id]="'questions-container-' + card.id">
-              <div class="question" 
-                   *ngFor="let question of card.questions; let questionIndex = index" 
-                   [id]="'question-' + card.id + '-' + question.id">
-                <div class="question-text" [id]="'question-text-' + card.id + '-' + question.id">
-                  {{ question.text }}
-                </div>
-                <div class="options-container" [id]="'options-container-' + card.id + '-' + question.id">
-                  <ng-container [ngSwitch]="question.type">
-                    <!-- Radio Options -->
-                    <div *ngSwitchCase="'radio'" 
-                         class="radio-options" 
-                         [id]="'radio-options-' + card.id + '-' + question.id">
-                      <label *ngFor="let option of question.options; let optionIndex = index" 
-                             class="radio-option"
-                             [id]="'radio-option-label-' + card.id + '-' + question.id + '-' + optionIndex">
-                        <input type="radio" 
-                               [name]="'radio-' + question.id"
-                               [id]="'radio-' + card.id + '-' + question.id + '-' + optionIndex"
-                               [value]="option"
-                               [(ngModel)]="answers[question.id]"
-                               (ngModelChange)="onAnswerChange(question.id, $event)">
+              <div *ngFor="let question of card.questions; let questionIndex = index" 
+                   class="question-container" 
+                   [id]="'question-' + question.id">
+                <label [for]="question.id" class="question-label">
+                  {{question.label}}
+                  <span *ngIf="question.required" class="required">*</span>
+                  <span *ngIf="question.help" class="help-tooltip" [title]="question.help.tooltip">
+                    <i [class]="'icon-' + question.help.icon"></i>
+                  </span>
+                </label>
+
+                <ng-container [ngSwitch]="question.type">
+                  <!-- Text Input -->
+                  <ng-container *ngSwitchCase="'text'">
+                    <input *ngIf="isTextQuestion(question)"
+                           [id]="question.id"
+                           [name]="question.id"
+                           [(ngModel)]="answers[question.id]"
+                           [required]="question.required"
+                           [placeholder]="question.placeholder"
+                           [attr.maxlength]="question.maxLength || null">
+                  </ng-container>
+
+                  <!-- Email Input -->
+                  <ng-container *ngSwitchCase="'email'">
+                    <input *ngIf="isEmailQuestion(question)"
+                           type="email"
+                           [id]="question.id"
+                           [name]="question.id"
+                           [(ngModel)]="answers[question.id]"
+                           [required]="question.required"
+                           [placeholder]="question.placeholder">
+                  </ng-container>
+
+                  <!-- Telephone Input -->
+                  <ng-container *ngSwitchCase="'tel'">
+                    <input *ngIf="isTelQuestion(question)"
+                           type="tel"
+                           [id]="question.id"
+                           [name]="question.id"
+                           [(ngModel)]="answers[question.id]"
+                           [required]="question.required"
+                           [placeholder]="question.placeholder">
+                  </ng-container>
+
+                  <!-- Date Input -->
+                  <ng-container *ngSwitchCase="'date'">
+                    <input *ngIf="isDateQuestion(question)"
+                           type="date"
+                           [id]="question.id"
+                           [name]="question.id"
+                           [(ngModel)]="answers[question.id]"
+                           [required]="question.required">
+                  </ng-container>
+
+                  <!-- Dropdown -->
+                  <ng-container *ngSwitchCase="'dropdown'">
+                    <select *ngIf="isDropdownQuestion(question)"
+                            [id]="question.id"
+                            [name]="question.id"
+                            [(ngModel)]="answers[question.id]"
+                            [required]="question.required">
+                      <option value="">Select an option</option>
+                      <option *ngFor="let option of question.options" [value]="option">
                         {{ option }}
-                      </label>
-                    </div>
+                      </option>
+                    </select>
+                  </ng-container>
 
-                    <!-- Checkbox Options -->
-                    <div *ngSwitchCase="'checkbox'" 
-                         class="checkbox-options" 
-                         [id]="'checkbox-options-' + card.id + '-' + question.id">
-                      <label *ngFor="let option of question.options; let optionIndex = index" 
-                             class="checkbox-option"
-                             [id]="'checkbox-option-label-' + card.id + '-' + question.id + '-' + optionIndex">
-                        <input type="checkbox"
-                               [id]="'checkbox-' + card.id + '-' + question.id + '-' + optionIndex"
+                  <!-- Radio Buttons -->
+                  <ng-container *ngSwitchCase="'radio'">
+                    <div *ngIf="isRadioQuestion(question)"
+                         class="radio-group"
+                         [id]="'radio-group-' + card.id + '-' + question.id">
+                      <label *ngFor="let option of question.options" class="radio-option"
+                             [id]="'radio-option-label-' + card.id + '-' + question.id + '-' + option.value">
+                        <input type="radio"
+                               [name]="question.id"
+                               [value]="option.value"
                                [(ngModel)]="answers[question.id]"
-                               (ngModelChange)="onCheckboxChange(question.id, option, $event)"
-                               [value]="option">
-                        {{ option }}
+                               [required]="question.required">
+                        {{ option.label }}
                       </label>
-                    </div>
-
-                    <!-- Dropdown -->
-                    <div *ngSwitchCase="'dropdown'" 
-                         class="dropdown-container" 
-                         [id]="'dropdown-container-' + card.id + '-' + question.id">
-                      <select [id]="'dropdown-' + card.id + '-' + question.id"
-                              [(ngModel)]="answers[question.id]"
-                              (ngModelChange)="onAnswerChange(question.id, $event)">
-                        <option [ngValue]="''" [id]="'dropdown-default-' + card.id + '-' + question.id">
-                          Select an option
-                        </option>
-                        <option *ngFor="let option of question.options; let optionIndex = index" 
-                                [ngValue]="option"
-                                [id]="'dropdown-option-' + card.id + '-' + question.id + '-' + optionIndex">
-                          {{ option }}
-                        </option>
-                      </select>
-                    </div>
-
-                    <!-- Text Input -->
-                    <div *ngSwitchCase="'text'" 
-                         class="text-input" 
-                         [id]="'text-input-' + card.id + '-' + question.id">
-                      <input type="text"
-                             [id]="'text-' + card.id + '-' + question.id"
-                             [(ngModel)]="answers[question.id]"
-                             (ngModelChange)="onAnswerChange(question.id, $event)"
-                             (blur)="onBlur(question.id)">
                     </div>
                   </ng-container>
+
+                  <!-- Checkboxes -->
+                  <ng-container *ngSwitchCase="'checkbox'">
+                    <div *ngIf="isCheckboxQuestion(question)"
+                         class="checkbox-group"
+                         [id]="'checkbox-group-' + card.id + '-' + question.id">
+                      <label *ngFor="let option of question.options" class="checkbox-option"
+                             [id]="'checkbox-option-label-' + card.id + '-' + question.id + '-' + option">
+                        <input type="checkbox"
+                               [name]="question.id"
+                               [value]="option"
+                               [checked]="isOptionSelected(question.id, option)"
+                               (change)="onCheckboxChange(question.id, option, $any($event.target).checked)"
+                               [required]="question.required">
+                        {{ option }}
+                      </label>
+                    </div>
+                  </ng-container>
+                </ng-container>
+
+                <div *ngIf="showError(question)" class="error-message" [id]="'error-message-' + card.id + '-' + question.id">
+                  {{question.validation?.[0]?.message || 'This field is required'}}
                 </div>
-                <div *ngIf="validationErrors[question.id]" 
-                     class="error-message" 
-                     [id]="'error-message-' + card.id + '-' + question.id">
-                  This field is required
+
+                <div *ngIf="question.conditionalWarning" class="warning-message" [id]="'warning-message-' + card.id + '-' + question.id">
+                  {{question.conditionalWarning.message}}
                 </div>
               </div>
             </div>

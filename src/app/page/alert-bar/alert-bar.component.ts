@@ -9,6 +9,6 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./alert-bar.component.scss']
 })
 export class AlertBarComponent {
-  @Input() show = false;
-  @Input() messages: string[] = [];
+  @Input() message: string = '';
+  @Input() type: 'error' | 'warning' | 'info' = 'info';
 } 
