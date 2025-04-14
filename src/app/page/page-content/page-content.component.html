@@ -43,8 +43,9 @@
                              [id]="'checkbox-option-label-' + card.id + '-' + question.id + '-' + optionIndex">
                         <input type="checkbox"
                                [id]="'checkbox-' + card.id + '-' + question.id + '-' + optionIndex"
-                               [checked]="isOptionSelected(question.id, option)"
-                               (change)="onCheckboxChange(question.id, option, $event)">
+                               [(ngModel)]="answers[question.id]"
+                               (ngModelChange)="onCheckboxChange(question.id, option, $event)"
+                               [value]="option">
                         {{ option }}
                       </label>
                     </div>
@@ -54,13 +55,13 @@
                          class="dropdown-container" 
                          [id]="'dropdown-container-' + card.id + '-' + question.id">
                       <select [id]="'dropdown-' + card.id + '-' + question.id"
-                              (change)="onAnswerChange(question.id, $any($event.target).value)">
-                        <option value="" [id]="'dropdown-default-' + card.id + '-' + question.id">
+                              [(ngModel)]="answers[question.id]"
+                              (ngModelChange)="onAnswerChange(question.id, $event)">
+                        <option [ngValue]="''" [id]="'dropdown-default-' + card.id + '-' + question.id">
                           Select an option
                         </option>
                         <option *ngFor="let option of question.options; let optionIndex = index" 
-                                [value]="option"
-                                [selected]="getAnswer(question.id) === option"
+                                [ngValue]="option"
                                 [id]="'dropdown-option-' + card.id + '-' + question.id + '-' + optionIndex">
                           {{ option }}
                         </option>
@@ -73,8 +74,8 @@
                          [id]="'text-input-' + card.id + '-' + question.id">
                       <input type="text"
                              [id]="'text-' + card.id + '-' + question.id"
-                             [value]="getAnswer(question.id)"
-                             (input)="onAnswerChange(question.id, $any($event.target).value)"
+                             [(ngModel)]="answers[question.id]"
+                             (ngModelChange)="onAnswerChange(question.id, $event)"
                              (blur)="onBlur(question.id)">
                     </div>
                   </ng-container>

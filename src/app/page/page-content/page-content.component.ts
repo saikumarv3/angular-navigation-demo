@@ -24,20 +24,32 @@ export class PageContentComponent {
   @Output() answerChange = new EventEmitter<{ questionId: string, answer: string | string[] }>();
   @Output() blur = new EventEmitter<string>();
 
+  ngOnChanges() {
+    // Initialize empty answers for dropdown questions
+    if (this.currentPageData?.cards) {
+      this.currentPageData.cards.forEach(card => {
+        card.questions.forEach(question => {
+          if (question.type === 'dropdown' && !this.answers[question.id]) {
+            this.answers[question.id] = '';
+          }
+        });
+      });
+    }
+  }
+
   onAnswerChange(questionId: string, value: string | Event) {
     const answer = typeof value === 'string' ? value : (value.target as HTMLInputElement).value;
     this.answerChange.emit({ questionId, answer });
   }
 
-  onCheckboxChange(questionId: string, optionId: string, event: Event) {
-    const target = event.target as HTMLInputElement;
+  onCheckboxChange(questionId: string, option: string, event: any) {
     const currentAnswers = (this.answers[questionId] as string[]) || [];
     let newAnswers: string[];
     
-    if (target.checked) {
-      newAnswers = [...currentAnswers, optionId];
+    if (event) {
+      newAnswers = [...currentAnswers, option];
     } else {
-      newAnswers = currentAnswers.filter(id => id !== optionId);
+      newAnswers = currentAnswers.filter(ans => ans !== option);
     }
     
     this.answerChange.emit({ questionId, answer: newAnswers });
