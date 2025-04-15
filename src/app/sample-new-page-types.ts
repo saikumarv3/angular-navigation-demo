@@ -225,13 +225,13 @@ export const CAR_VALIDATION_RULES = {
 
   
 // Common options for Yes/No questions
-const YES_NO_OPTIONS = [
+export const YES_NO_OPTIONS = [
     { label: 'Yes', value: 'yes' },
     { label: 'No', value: 'no' }
   ];
   
   // List of all US states
-  const ALL_US_STATES = [
+  export const ALL_US_STATES = [
     'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut',
     'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa',
     'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan',
@@ -243,10 +243,10 @@ const YES_NO_OPTIONS = [
   ];
   
   // States where we don't operate
-  const UNSUPPORTED_STATES = ['New York'];
+  export const UNSUPPORTED_STATES = ['New York'];
   
   // Get supported states by excluding unsupported ones
-  const SUPPORTED_STATES = ALL_US_STATES.filter(state => !UNSUPPORTED_STATES.includes(state));
+  export const SUPPORTED_STATES = ALL_US_STATES.filter(state => !UNSUPPORTED_STATES.includes(state));
   
   // Car-specific form builder schema
   export const CAR_FORM_BUILDER_SCHEMA = {
