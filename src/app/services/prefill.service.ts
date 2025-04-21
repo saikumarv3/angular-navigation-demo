@@ -6,120 +6,21 @@ import { of } from 'rxjs';
   providedIn: 'root'
 })
 export class PrefillService {
-  private answers: { [key: string]: string } = {};
+  private answers: { [key: string]: string } = {
+    'car-type': 'SUV',
+    'car-model': 'Toyota RAV4',
+    'car-year': '2023',
+    'transmission': 'automatic',
+    'fuel-type': 'hybrid',
+    'state': 'CA',
+    'zip-code': '90210'
+  };
 
   constructor() {}
 
   getPrefillData(filename: string) {
-    // For now, we'll return a hardcoded page data
-    // Later we can implement HTTP to load from assets
-    const pageData: Page = {
-      id: 'car-selection',
-      page: '/select-car',
-      title: 'Select Your Car',
-      cards: [
-        {
-          id: 'car-type-selection',
-          heading: 'Car Type and Features',
-          description: 'Select your preferred car type and additional features',
-          questions: [
-            {
-              id: 'car-type',
-              type: 'dropdown',
-              label: 'Which type of car are you interested in?',
-              required: true,
-              layout: 'full',
-              options: ['Sedan', 'SUV', 'Truck', 'Van', 'Sports Car'],
-              validation: [
-                { type: 'required', message: 'Please select a car type' }
-              ]
-            },
-            {
-              id: 'car-model',
-              type: 'text',
-              label: 'What model are you looking for?',
-              required: true,
-              layout: 'full',
-              validation: [
-                { type: 'required', message: 'Please enter a car model' }
-              ]
-            },
-            {
-              id: 'car-year',
-              type: 'text',
-              label: 'What year?',
-              required: true,
-              layout: 'full',
-              validation: [
-                { type: 'required', message: 'Please enter a year' },
-                { type: 'pattern', message: 'Please enter a valid year', pattern: '^\\d{4}$' }
-              ]
-            },
-            {
-              id: 'transmission',
-              type: 'radio',
-              label: 'Preferred transmission type?',
-              required: true,
-              layout: 'full',
-              options: [
-                { label: 'Automatic', value: 'automatic' },
-                { label: 'Manual', value: 'manual' }
-              ],
-              validation: [
-                { type: 'required', message: 'Please select a transmission type' }
-              ]
-            },
-            {
-              id: 'fuel-type',
-              type: 'radio',
-              label: 'Preferred fuel type?',
-              required: true,
-              layout: 'full',
-              options: [
-                { label: 'Gasoline', value: 'gasoline' },
-                { label: 'Diesel', value: 'diesel' },
-                { label: 'Electric', value: 'electric' },
-                { label: 'Hybrid', value: 'hybrid' }
-              ],
-              validation: [
-                { type: 'required', message: 'Please select a fuel type' }
-              ]
-            }
-          ]
-        },
-        {
-          id: 'location-info',
-          heading: 'Location Information',
-          description: 'Please provide your location details',
-          questions: [
-            {
-              id: 'state',
-              type: 'dropdown',
-              label: 'In which state do you reside?',
-              required: true,
-              layout: 'full',
-              options: ['CA', 'NY', 'TX', 'FL', 'IL'],
-              validation: [
-                { type: 'required', message: 'Please select a state' }
-              ]
-            },
-            {
-              id: 'zip-code',
-              type: 'text',
-              label: 'ZIP Code',
-              required: true,
-              layout: 'full',
-              validation: [
-                { type: 'required', message: 'Please enter a ZIP code' },
-                { type: 'pattern', message: 'Please enter a valid ZIP code', pattern: '^\\d{5}$' }
-              ]
-            }
-          ]
-        }
-      ]
-    };
-
-    return of(pageData);
+    // Return the prefill answers
+    return of(this.answers);
   }
 
   getAnswers(): { [key: string]: string } {

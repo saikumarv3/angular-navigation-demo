@@ -1,1 +1,34 @@
-<p>welcome works!</p>
+<div class="welcome-container">
+  <h1>Welcome to Car Selection</h1>
+  <p>Choose a pre-configured option or start fresh</p>
+
+  <table class="car-options-table">
+    <thead>
+      <tr>
+        <th>Car Type</th>
+        <th>Model</th>
+        <th>Fuel Type</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let option of carOptions">
+        <td>{{ option.carType }}</td>
+        <td>{{ option.carModel }}</td>
+        <td>{{ option.fuelType }}</td>
+        <td>
+          <button class="prefill-button" (click)="handlePrefill(option.prefillData)">
+            Prefill
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="manual-entry-container">
+    <p>Or start with a blank form</p>
+    <button class="manual-entry-button" (click)="handleManualEntry()">
+      Manual Entry
+    </button>
+  </div>
+</div>

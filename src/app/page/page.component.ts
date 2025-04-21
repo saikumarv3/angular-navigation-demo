@@ -2,10 +2,11 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { PageContentComponent } from './page-content/page-content.component';
-import { Page, ValidationRule } from '../new-page-types';
+import { Page } from '../new-page-types';
 import { AlertBarComponent } from './alert-bar/alert-bar.component';
 import { CrossOverValidationService } from '../services/cross-over-validation.service';
 import { PrefillService } from '../services/prefill.service';
+import { TrisionService } from '../services/trision.service';
 
 @Component({
   selector: 'app-page',
@@ -29,7 +30,8 @@ export class PageComponent implements OnInit, OnDestroy {
     private router: Router,
     private route: ActivatedRoute,
     private crossOverValidationService: CrossOverValidationService,
-    private prefillService: PrefillService
+    private prefillService: PrefillService,
+    private trisionService: TrisionService
   ) {}
 
   ngOnInit(): void {
@@ -42,18 +44,19 @@ export class PageComponent implements OnInit, OnDestroy {
         this.updatePageData();
       }
     });
+
+    // Get prefill data from history state
+    const prefillData = history.state.prefillData;
+    if (prefillData) {
+      this.answers = prefillData;
+      console.log('Prefill data loaded:', this.answers);
+    }
   }
 
   private loadPageData(): void {
-    this.prefillService.getPrefillData('prefillsampledatafile1.json').subscribe({
-      next: (data) => {
-        this.PAGES = [data];
-        this.currentPageData = data;
-      },
-      error: (error) => {
-        console.error('Error loading page data:', error);
-      }
-    });
+    // Get page structure from Trision service
+    this.PAGES = this.trisionService.getPageStructure();
+    this.currentPageData = this.PAGES[this.currentPageIndex];
   }
 
   ngOnDestroy(): void {
@@ -94,17 +97,12 @@ export class PageComponent implements OnInit, OnDestroy {
   }
 
   handleNext(): void {
-    if (this.currentPageIndex < this.PAGES.length - 1) {
-      this.currentPageIndex++;
-      this.updatePageData();
-    }
+    // Since we only have one page, we'll just navigate back to the welcome screen
+    this.router.navigate(['/']);
   }
 
   handleBack(): void {
-    if (this.currentPageIndex > 0) {
-      this.currentPageIndex--;
-      this.updatePageData();
-    }
+    this.router.navigate(['/']);
   }
 
   handleExit(): void {
