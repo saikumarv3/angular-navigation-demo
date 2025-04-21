@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { PREFILL_DATA } from '../data/prefill.data';
+import { Page } from '../new-page-types';
+import { of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -7,25 +8,125 @@ import { PREFILL_DATA } from '../data/prefill.data';
 export class PrefillService {
   private answers: { [key: string]: string } = {};
 
-  constructor() {
-    // Initialize answers from prefill data
-    this.initializeAnswers();
-  }
+  constructor() {}
 
-  private initializeAnswers() {
-    // Flatten the nested prefill data into a single answers object
-    Object.entries(PREFILL_DATA).forEach(([pageId, pageAnswers]) => {
-      Object.entries(pageAnswers).forEach(([questionId, answer]) => {
-        this.answers[questionId] = answer;
-      });
-    });
+  getPrefillData(filename: string) {
+    // For now, we'll return a hardcoded page data
+    // Later we can implement HTTP to load from assets
+    const pageData: Page = {
+      id: 'car-selection',
+      page: '/select-car',
+      title: 'Select Your Car',
+      cards: [
+        {
+          id: 'car-type-selection',
+          heading: 'Car Type and Features',
+          description: 'Select your preferred car type and additional features',
+          questions: [
+            {
+              id: 'car-type',
+              type: 'dropdown',
+              label: 'Which type of car are you interested in?',
+              required: true,
+              layout: 'full',
+              options: ['Sedan', 'SUV', 'Truck', 'Van', 'Sports Car'],
+              validation: [
+                { type: 'required', message: 'Please select a car type' }
+              ]
+            },
+            {
+              id: 'car-model',
+              type: 'text',
+              label: 'What model are you looking for?',
+              required: true,
+              layout: 'full',
+              validation: [
+                { type: 'required', message: 'Please enter a car model' }
+              ]
+            },
+            {
+              id: 'car-year',
+              type: 'text',
+              label: 'What year?',
+              required: true,
+              layout: 'full',
+              validation: [
+                { type: 'required', message: 'Please enter a year' },
+                { type: 'pattern', message: 'Please enter a valid year', pattern: '^\\d{4}$' }
+              ]
+            },
+            {
+              id: 'transmission',
+              type: 'radio',
+              label: 'Preferred transmission type?',
+              required: true,
+              layout: 'full',
+              options: [
+                { label: 'Automatic', value: 'automatic' },
+                { label: 'Manual', value: 'manual' }
+              ],
+              validation: [
+                { type: 'required', message: 'Please select a transmission type' }
+              ]
+            },
+            {
+              id: 'fuel-type',
+              type: 'radio',
+              label: 'Preferred fuel type?',
+              required: true,
+              layout: 'full',
+              options: [
+                { label: 'Gasoline', value: 'gasoline' },
+                { label: 'Diesel', value: 'diesel' },
+                { label: 'Electric', value: 'electric' },
+                { label: 'Hybrid', value: 'hybrid' }
+              ],
+              validation: [
+                { type: 'required', message: 'Please select a fuel type' }
+              ]
+            }
+          ]
+        },
+        {
+          id: 'location-info',
+          heading: 'Location Information',
+          description: 'Please provide your location details',
+          questions: [
+            {
+              id: 'state',
+              type: 'dropdown',
+              label: 'In which state do you reside?',
+              required: true,
+              layout: 'full',
+              options: ['CA', 'NY', 'TX', 'FL', 'IL'],
+              validation: [
+                { type: 'required', message: 'Please select a state' }
+              ]
+            },
+            {
+              id: 'zip-code',
+              type: 'text',
+              label: 'ZIP Code',
+              required: true,
+              layout: 'full',
+              validation: [
+                { type: 'required', message: 'Please enter a ZIP code' },
+                { type: 'pattern', message: 'Please enter a valid ZIP code', pattern: '^\\d{5}$' }
+              ]
+            }
+          ]
+        }
+      ]
+    };
+
+    return of(pageData);
   }
 
   getAnswers(): { [key: string]: string } {
     return { ...this.answers };
   }
 
-  clearAnswers() {
+  clearAnswers(): void {
     this.answers = {};
   }
 } 

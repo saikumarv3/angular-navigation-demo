@@ -1,40 +1,19 @@
 <div class="page-container">
-
-  <app-alert-bar 
-    *ngIf="showLanError"
-    message="LAN check failed. Please try again."
-    type="error">
-  </app-alert-bar>
-
-  <app-alert-bar 
-    *ngFor="let message of crossOverMessages"
-    [message]="message"
-    type="warning">
-  </app-alert-bar>
-  
   <app-page-content
-    [title]="currentPageData?.title || ''"
     [currentPageData]="currentPageData"
     [answers]="answers"
-    [isFormValid]="isFormValid"
-    [hasNext]="currentPageIndex < PAGES.length - 1"
     [validationErrors]="validationErrors"
+    [isFormValid]="isFormValid"
     (next)="handleNext()"
     (back)="handleBack()"
     (exit)="handleExit()"
     (answerChange)="handleAnswerChange($event)"
-    (blur)="handleBlur($event)">
-  </app-page-content>
+    (blur)="handleBlur($event)"
+  ></app-page-content>
 
-  <div *ngIf="showBackError">
-    <app-alert-bar 
-      message="Cannot go back from this page"
-      type="error">
-    </app-alert-bar>
-  </div>
-
-  <div *ngIf="isCheckingLan" class="loading-overlay">
-    <div class="loading-spinner"></div>
-    <p>Checking LAN status...</p>
-  </div>
+  <app-alert-bar
+    *ngFor="let message of crossOverMessages"
+    [message]="message"
+    type="warning"
+  ></app-alert-bar>
 </div> 
