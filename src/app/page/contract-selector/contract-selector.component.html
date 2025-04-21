@@ -1,3 +1,32 @@
-<div class="contract-selector-container">
+<div class="contract-selector-container" *ngIf="!showPageContent">
   <h1>Welcome to Contract Selector Page</h1>
+  
+  <div class="prefill-options">
+    <h2>Select a Pre-configured Option</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Car Type</th>
+          <th>Model</th>
+          <th>Fuel Type</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let option of carOptions">
+          <td>{{ option.carType }}</td>
+          <td>{{ option.carModel }}</td>
+          <td>{{ option.fuelType }}</td>
+          <td>
+            <button (click)="handlePrefill(option.prefillData)">Select</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="manual-entry">
+    <h2>Or Start Fresh</h2>
+    <button (click)="handleManualEntry()">Manual Entry</button>
+  </div>
 </div> 

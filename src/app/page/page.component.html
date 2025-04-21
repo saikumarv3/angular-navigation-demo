@@ -1,6 +1,7 @@
 <div class="page-container">
-  <app-contract-selector></app-contract-selector>
+  <app-contract-selector *ngIf="!showPageContent" (prefillSelected)="onPrefillSelected($event)"></app-contract-selector>
   <app-page-content
+    *ngIf="showPageContent"
     [currentPageData]="currentPageData"
     [answers]="answers"
     [validationErrors]="validationErrors"

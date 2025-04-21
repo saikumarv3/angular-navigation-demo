@@ -26,6 +26,7 @@ export class PageComponent implements OnInit, OnDestroy {
   crossOverMessages: string[] = [];
   hasAttemptedNext = false;
   PAGES: Page[] = [];
+  showPageContent = false;
 
   constructor(
     private router: Router,
@@ -36,8 +37,15 @@ export class PageComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    console.log('PageComponent initialized');
+    
+    // First load the page data
     this.loadPageData();
+    console.log('Page data loaded:', this.currentPageData);
+    
+    // Then handle route parameters
     this.route.params.subscribe(params => {
+      console.log('Route params:', params);
       const pageId = params['title'];
       const pageIndex = this.PAGES.findIndex((page: Page) => page.title === pageId);
       if (pageIndex !== -1) {
@@ -48,14 +56,23 @@ export class PageComponent implements OnInit, OnDestroy {
 
     // Get prefill data from history state
     const prefillData = history.state.prefillData;
+    console.log('History state:', history.state);
+    console.log('Prefill data from history:', prefillData);
+    
     if (prefillData) {
-      this.answers = prefillData;
-      console.log('Prefill data loaded:', this.answers);
+      console.log('Applying prefill data:', prefillData);
+      // Set the answers with the prefill data
+      this.answers = { ...prefillData };
+      console.log('Answers after prefill:', this.answers);
+      this.showPageContent = true;
+      // Update the page data to reflect the prefill
+      this.updatePageData();
     }
   }
 
   private loadPageData(): void {
     this.PAGES = this.trisionService.getPageStructure();
+    this.currentPageIndex = 0; // Reset to first page
     this.currentPageData = this.PAGES[this.currentPageIndex];
   }
 
@@ -64,6 +81,8 @@ export class PageComponent implements OnInit, OnDestroy {
   }
 
   updatePageData(): void {
+    console.log('Updating page data');
+    console.log('Current answers:', this.answers);
     this.currentPageData = this.PAGES[this.currentPageIndex];
     this.validateForm();
   }
@@ -171,5 +190,9 @@ export class PageComponent implements OnInit, OnDestroy {
       .subscribe((messages: string[]) => {
         this.crossOverMessages = messages;
       });
+  }
+
+  onPrefillSelected(showContent: boolean) {
+    this.showPageContent = showContent;
   }
 }

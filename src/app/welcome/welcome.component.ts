@@ -81,4 +81,8 @@ export class WelcomeComponent {
   handleManualEntry(): void {
     this.router.navigate(['/page', 'Select Your Car']);
   }
+
+  handleStart() {
+    this.router.navigate(['/page', 'Select Your Car']);
+  }
 }

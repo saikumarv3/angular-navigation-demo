@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NavigationButtonsComponent } from '../navigation-buttons/navigation-buttons.component';
@@ -15,23 +15,42 @@ export class PageContentComponent {
   @Input() title: string = '';
   @Input() currentPageData: Page | null = null;
   @Input() answers: { [key: string]: string | string[] } = {};
-  @Input() isFormValid: boolean = true;
-  @Input() hasNext: boolean = true;
   @Input() validationErrors: { [key: string]: string } = {};
+  @Input() isFormValid: boolean = true;
+  @Input() hasNext: boolean = false;
   @Input() hasAttemptedNext: boolean = false;
+
+  @Output() answerChange = new EventEmitter<{ questionId: string; answer: string | string[] }>();
+  @Output() blur = new EventEmitter<{ questionId: string }>();
   @Output() next = new EventEmitter<void>();
   @Output() back = new EventEmitter<void>();
   @Output() exit = new EventEmitter<void>();
-  @Output() answerChange = new EventEmitter<{ questionId: string; answer: string | string[] }>();
-  @Output() blur = new EventEmitter<{ questionId: string }>();
 
-  onAnswerChange(questionId: string, value: string | string[]): void {
-    this.answers[questionId] = value;
-    this.answerChange.emit({ questionId, answer: value });
+  constructor() {
+    console.log('PageContentComponent initialized');
+    console.log('Initial answers:', this.answers);
+  }
+
+  ngOnChanges() {
+    console.log('PageContentComponent changes detected');
+    console.log('Current answers:', this.answers);
+    console.log('Current page data:', this.currentPageData);
+  }
+
+  onAnswerChange(questionId: string, answer: string | string[]): void {
+    this.answerChange.emit({ questionId, answer });
   }
 
   onBlur(questionId: string): void {
     this.blur.emit({ questionId });
+  }
+
+  onNext(): void {
+    this.next.emit();
+  }
+
+  onBack(): void {
+    this.back.emit();
   }
 
   onExit(): void {
