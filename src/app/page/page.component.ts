@@ -7,11 +7,12 @@ import { AlertBarComponent } from './alert-bar/alert-bar.component';
 import { CrossOverValidationService } from '../services/cross-over-validation.service';
 import { PrefillService } from '../services/prefill.service';
 import { TrisionService } from '../services/trision.service';
+import { ContractSelectorComponent } from './contract-selector/contract-selector.component';
 
 @Component({
   selector: 'app-page',
   standalone: true,
-  imports: [CommonModule, PageContentComponent, AlertBarComponent],
+  imports: [CommonModule, PageContentComponent, AlertBarComponent, ContractSelectorComponent],
   templateUrl: './page.component.html',
   styleUrls: ['./page.component.scss']
 })
