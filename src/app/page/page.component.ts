@@ -20,7 +20,7 @@ export class PageComponent implements OnInit, OnDestroy {
   currentPageData: Page | null = null;
   answers: { [key: string]: string | string[] } = {};
   isFormValid = true;
-  validationErrors: { [key: string]: string | boolean } = {};
+  validationErrors: { [key: string]: string } = {};
   isCheckingLan = false;
   crossOverMessages: string[] = [];
   hasAttemptedNext = false;
@@ -54,7 +54,6 @@ export class PageComponent implements OnInit, OnDestroy {
   }
 
   private loadPageData(): void {
-    // Get page structure from Trision service
     this.PAGES = this.trisionService.getPageStructure();
     this.currentPageData = this.PAGES[this.currentPageIndex];
   }
@@ -86,8 +85,11 @@ export class PageComponent implements OnInit, OnDestroy {
 
     this.currentPageData.cards.forEach(card => {
       card.questions.forEach(question => {
-        if (question.required && !this.answers[question.id]) {
-          this.validationErrors[question.id] = true;
+        const answer = this.answers[question.id];
+        const error = this.validateQuestion(question, answer);
+        
+        if (error) {
+          this.validationErrors[question.id] = error;
           isValid = false;
         }
       });
@@ -96,9 +98,61 @@ export class PageComponent implements OnInit, OnDestroy {
     this.isFormValid = isValid;
   }
 
+  private validateQuestion(question: any, answer: string | string[] | undefined): string | null {
+    // Check required validation
+    if (question.required && (!answer || (Array.isArray(answer) && answer.length === 0))) {
+      return 'This field is required';
+    }
+
+    // If not required and no answer, no need to check other validations
+    if (!answer) {
+      return null;
+    }
+
+    // Check other validation rules
+    if (question.validation) {
+      for (const rule of question.validation) {
+        switch (rule.type) {
+          case 'pattern':
+            if (typeof answer === 'string' && !new RegExp(rule.pattern).test(answer)) {
+              return rule.message;
+            }
+            break;
+          case 'minLength':
+            if (typeof answer === 'string' && answer.length < rule.value) {
+              return rule.message;
+            }
+            break;
+          case 'maxLength':
+            if (typeof answer === 'string' && answer.length > rule.value) {
+              return rule.message;
+            }
+            break;
+          case 'min':
+            if (typeof answer === 'string' && parseFloat(answer) < rule.value) {
+              return rule.message;
+            }
+            break;
+          case 'max':
+            if (typeof answer === 'string' && parseFloat(answer) > rule.value) {
+              return rule.message;
+            }
+            break;
+        }
+      }
+    }
+
+    return null;
+  }
+
   handleNext(): void {
-    // Since we only have one page, we'll just navigate back to the welcome screen
-    this.router.navigate(['/']);
+    this.hasAttemptedNext = true;
+    this.validateForm();
+    
+    if (this.isFormValid) {
+      // Navigate to advisor terms page
+      this.router.navigate(['/advisor-terms']);
+    }
   }
 
   handleBack(): void {

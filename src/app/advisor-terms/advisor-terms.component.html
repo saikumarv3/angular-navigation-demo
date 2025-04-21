@@ -1,0 +1,43 @@
+<div class="advisor-terms-container">
+  <h1>Advisor Terms and Conditions</h1>
+  
+  <div class="terms-content">
+    <h2>Terms of Service</h2>
+    <p>By accepting these terms, you agree to:</p>
+    <ul>
+      <li>Provide accurate and complete information about your vehicle preferences</li>
+      <li>Allow our advisors to contact you regarding your vehicle search</li>
+      <li>Receive communications about potential vehicle matches</li>
+      <li>Follow our privacy policy and terms of service</li>
+    </ul>
+
+    <h2>Privacy Policy</h2>
+    <p>We respect your privacy and will:</p>
+    <ul>
+      <li>Protect your personal information</li>
+      <li>Only use your data for the purpose of finding your ideal vehicle</li>
+      <li>Not share your information with third parties without your consent</li>
+      <li>Allow you to opt-out of communications at any time</li>
+    </ul>
+  </div>
+
+  <div class="terms-agreement">
+    <label class="checkbox-container">
+      <input 
+        type="checkbox" 
+        [(ngModel)]="agreeToTerms"
+        (change)="onCheckboxChange()"
+        [class.error]="showError"
+      />
+      <span class="checkmark"></span>
+      I agree to all terms and conditions
+    </label>
+    <div *ngIf="showError" class="error-message">
+      Please agree to the terms and conditions to proceed
+    </div>
+  </div>
+
+  <div class="buttons-container">
+    <button class="accept-button" (click)="handleAccept()">Accept Terms</button>
+  </div>
+</div> 

@@ -17,7 +17,8 @@ export class PageContentComponent {
   @Input() answers: { [key: string]: string | string[] } = {};
   @Input() isFormValid: boolean = true;
   @Input() hasNext: boolean = true;
-  @Input() validationErrors: { [key: string]: string | boolean } = {};
+  @Input() validationErrors: { [key: string]: string } = {};
+  @Input() hasAttemptedNext: boolean = false;
   @Output() next = new EventEmitter<void>();
   @Output() back = new EventEmitter<void>();
   @Output() exit = new EventEmitter<void>();
@@ -38,7 +39,36 @@ export class PageContentComponent {
   }
 
   showError(question: Question): boolean {
-    return !this.answers[question.id] && question.required;
+    return this.hasAttemptedNext && 
+           ((question.required && !this.answers[question.id]) || 
+            (this.validationErrors[question.id] !== undefined));
+  }
+
+  getErrorMessage(question: Question): string {
+    if (this.validationErrors[question.id]) {
+      return this.validationErrors[question.id];
+    }
+    if (question.required && !this.answers[question.id]) {
+      return `Please ${this.getQuestionTypeAction(question)}`;
+    }
+    return '';
+  }
+
+  private getQuestionTypeAction(question: Question): string {
+    switch (question.type) {
+      case 'text':
+      case 'email':
+      case 'tel':
+      case 'date':
+        return 'enter a value';
+      case 'dropdown':
+      case 'radio':
+        return 'select an option';
+      case 'checkbox':
+        return 'select at least one option';
+      default:
+        return 'complete this field';
+    }
   }
 
   isOptionSelected(questionId: string, option: string): boolean {

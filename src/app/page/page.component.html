@@ -4,16 +4,20 @@
     [answers]="answers"
     [validationErrors]="validationErrors"
     [isFormValid]="isFormValid"
+    [hasNext]="true"
+    [hasAttemptedNext]="hasAttemptedNext"
+    (answerChange)="handleAnswerChange($event)"
+    (blur)="handleBlur($event)"
     (next)="handleNext()"
     (back)="handleBack()"
     (exit)="handleExit()"
-    (answerChange)="handleAnswerChange($event)"
-    (blur)="handleBlur($event)"
   ></app-page-content>
 
-  <app-alert-bar
-    *ngFor="let message of crossOverMessages"
-    [message]="message"
-    type="warning"
-  ></app-alert-bar>
+  <div class="alert-container" *ngIf="crossOverMessages.length > 0">
+    <app-alert-bar
+      *ngFor="let message of crossOverMessages"
+      [message]="message"
+      type="warning"
+    ></app-alert-bar>
+  </div>
 </div> 

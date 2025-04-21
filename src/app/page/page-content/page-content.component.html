@@ -38,7 +38,10 @@
                            [(ngModel)]="answers[question.id]"
                            [required]="question.required"
                            [placeholder]="question.placeholder"
-                           [attr.maxlength]="question.maxLength || null">
+                           [attr.maxlength]="question.maxLength || null"
+                           (ngModelChange)="onAnswerChange(question.id, $event)"
+                           (blur)="onBlur(question.id)"
+                           [class.error]="showError(question)">
                   </ng-container>
 
                   <!-- Email Input -->
@@ -49,7 +52,10 @@
                            [name]="question.id"
                            [(ngModel)]="answers[question.id]"
                            [required]="question.required"
-                           [placeholder]="question.placeholder">
+                           [placeholder]="question.placeholder"
+                           (ngModelChange)="onAnswerChange(question.id, $event)"
+                           (blur)="onBlur(question.id)"
+                           [class.error]="showError(question)">
                   </ng-container>
 
                   <!-- Telephone Input -->
@@ -60,7 +66,10 @@
                            [name]="question.id"
                            [(ngModel)]="answers[question.id]"
                            [required]="question.required"
-                           [placeholder]="question.placeholder">
+                           [placeholder]="question.placeholder"
+                           (ngModelChange)="onAnswerChange(question.id, $event)"
+                           (blur)="onBlur(question.id)"
+                           [class.error]="showError(question)">
                   </ng-container>
 
                   <!-- Date Input -->
@@ -70,7 +79,10 @@
                            [id]="question.id"
                            [name]="question.id"
                            [(ngModel)]="answers[question.id]"
-                           [required]="question.required">
+                           [required]="question.required"
+                           (ngModelChange)="onAnswerChange(question.id, $event)"
+                           (blur)="onBlur(question.id)"
+                           [class.error]="showError(question)">
                   </ng-container>
 
                   <!-- Dropdown -->
@@ -79,7 +91,10 @@
                             [id]="question.id"
                             [name]="question.id"
                             [(ngModel)]="answers[question.id]"
-                            [required]="question.required">
+                            [required]="question.required"
+                            (ngModelChange)="onAnswerChange(question.id, $event)"
+                            (blur)="onBlur(question.id)"
+                            [class.error]="showError(question)">
                       <option value="">Select an option</option>
                       <option *ngFor="let option of question.options" [value]="option">
                         {{ option }}
@@ -91,14 +106,16 @@
                   <ng-container *ngSwitchCase="'radio'">
                     <div *ngIf="isRadioQuestion(question)"
                          class="radio-group"
-                         [id]="'radio-group-' + card.id + '-' + question.id">
+                         [id]="'radio-group-' + card.id + '-' + question.id"
+                         [class.error]="showError(question)">
                       <label *ngFor="let option of question.options" class="radio-option"
                              [id]="'radio-option-label-' + card.id + '-' + question.id + '-' + option.value">
                         <input type="radio"
                                [name]="question.id"
                                [value]="option.value"
                                [(ngModel)]="answers[question.id]"
-                               [required]="question.required">
+                               [required]="question.required"
+                               (ngModelChange)="onAnswerChange(question.id, $event)">
                         {{ option.label }}
                       </label>
                     </div>
@@ -108,14 +125,15 @@
                   <ng-container *ngSwitchCase="'checkbox'">
                     <div *ngIf="isCheckboxQuestion(question)"
                          class="checkbox-group"
-                         [id]="'checkbox-group-' + card.id + '-' + question.id">
+                         [id]="'checkbox-group-' + card.id + '-' + question.id"
+                         [class.error]="showError(question)">
                       <label *ngFor="let option of question.options" class="checkbox-option"
                              [id]="'checkbox-option-label-' + card.id + '-' + question.id + '-' + option">
                         <input type="checkbox"
                                [name]="question.id"
                                [value]="option"
                                [checked]="isOptionSelected(question.id, option)"
-                               (change)="onCheckboxChange(question.id, option, $any($event.target).checked)"
+                               (change)="onCheckboxChange(question.id, option, $any($event).target.checked)"
                                [required]="question.required">
                         {{ option }}
                       </label>
