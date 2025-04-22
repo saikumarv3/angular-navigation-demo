@@ -1,33 +1,20 @@
 import { Injectable } from '@angular/core';
-import { Page } from '../new-page-types';
-import { of } from 'rxjs';
+import { CAR_OPTIONS, CarOption } from './prefill-data';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PrefillService {
-  private answers: { [key: string]: string } = {
-    'car-type': 'SUV',
-    'car-model': 'Toyota RAV4',
-    'car-year': '2023',
-    'transmission': 'automatic',
-    'fuel-type': 'hybrid',
-    'state': 'CA',
-    'zip-code': '90210'
-  };
-
   constructor() {}
 
-  getPrefillData(filename: string) {
-    // Return the prefill answers
-    return of(this.answers);
+  getCarOptions(): CarOption[] {
+    return CAR_OPTIONS;
   }
 
-  getAnswers(): { [key: string]: string } {
-    return { ...this.answers };
-  }
-
-  clearAnswers(): void {
-    this.answers = {};
+  getPrefillData(carType: string, carModel: string): any {
+    const option = CAR_OPTIONS.find(
+      opt => opt.carType === carType && opt.carModel === carModel
+    );
+    return option ? option.prefillData : null;
   }
 } 

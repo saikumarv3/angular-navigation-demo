@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { PageContentComponent } from './page-content/page-content.component';
@@ -16,75 +16,53 @@ import { ContractSelectorComponent } from './contract-selector/contract-selector
   templateUrl: './page.component.html',
   styleUrls: ['./page.component.scss']
 })
-export class PageComponent implements OnInit, OnDestroy {
-  currentPageIndex = 0;
+export class PageComponent implements OnInit {
   currentPageData: Page | null = null;
   answers: { [key: string]: string | string[] } = {};
+  showPageContent = false;
+  isPrefilled = false;
+  currentPageIndex = 0;
   isFormValid = true;
   validationErrors: { [key: string]: string } = {};
   isCheckingLan = false;
   crossOverMessages: string[] = [];
   hasAttemptedNext = false;
   PAGES: Page[] = [];
-  showPageContent = false;
 
   constructor(
+    private trisionService: TrisionService,
+    private prefillService: PrefillService,
     private router: Router,
     private route: ActivatedRoute,
-    private crossOverValidationService: CrossOverValidationService,
-    private prefillService: PrefillService,
-    private trisionService: TrisionService
+    private crossOverValidationService: CrossOverValidationService
   ) {}
 
   ngOnInit(): void {
     console.log('PageComponent initialized');
     
-    // First load the page data
-    this.loadPageData();
-    console.log('Page data loaded:', this.currentPageData);
-    
-    // Then handle route parameters
-    this.route.params.subscribe(params => {
-      console.log('Route params:', params);
-      const pageId = params['title'];
-      const pageIndex = this.PAGES.findIndex((page: Page) => page.title === pageId);
-      if (pageIndex !== -1) {
-        this.currentPageIndex = pageIndex;
-        this.updatePageData();
-      }
-    });
-
     // Get prefill data from history state
     const prefillData = history.state.prefillData;
-    console.log('History state:', history.state);
-    console.log('Prefill data from history:', prefillData);
+    this.isPrefilled = !!prefillData;
     
     if (prefillData) {
-      console.log('Applying prefill data:', prefillData);
-      // Set the answers with the prefill data
+      console.log('PageComponent - Prefill data received:', prefillData);
       this.answers = { ...prefillData };
-      console.log('Answers after prefill:', this.answers);
-      this.showPageContent = true;
-      // Update the page data to reflect the prefill
-      this.updatePageData();
+      console.log('PageComponent - Answers after prefill:', this.answers);
     }
+    
+    // Load page data
+    this.loadPageData();
   }
 
-  private loadPageData(): void {
+  loadPageData(): void {
     this.PAGES = this.trisionService.getPageStructure();
     this.currentPageIndex = 0; // Reset to first page
     this.currentPageData = this.PAGES[this.currentPageIndex];
+    this.showPageContent = true;
   }
 
-  ngOnDestroy(): void {
-    // Cleanup if needed
-  }
-
-  updatePageData(): void {
-    console.log('Updating page data');
-    console.log('Current answers:', this.answers);
-    this.currentPageData = this.PAGES[this.currentPageIndex];
-    this.validateForm();
+  onPrefillSelected(showContent: boolean): void {
+    this.showPageContent = showContent;
   }
 
   handleAnswerChange(event: { questionId: string; answer: string | string[] }): void {
@@ -97,11 +75,28 @@ export class PageComponent implements OnInit, OnDestroy {
     this.validateForm();
   }
 
-  validateForm(): void {
+  handleNext(): void {
+    this.hasAttemptedNext = true;
+    if (this.validateForm()) {
+      this.router.navigate(['/advisor-terms']);
+    }
+  }
+
+  handleBack(): void {
+    this.router.navigate(['/welcome']);
+  }
+
+  handleExit(): void {
+    if (confirm('Are you sure you want to exit?')) {
+      this.router.navigate(['/']);
+    }
+  }
+
+  validateForm(): boolean {
+    if (!this.currentPageData) return false;
+
     this.validationErrors = {};
     let isValid = true;
-
-    if (!this.currentPageData) return;
 
     this.currentPageData.cards.forEach(card => {
       card.questions.forEach(question => {
@@ -116,6 +111,7 @@ export class PageComponent implements OnInit, OnDestroy {
     });
 
     this.isFormValid = isValid;
+    return isValid;
   }
 
   private validateQuestion(question: any, answer: string | string[] | undefined): string | null {
@@ -165,24 +161,8 @@ export class PageComponent implements OnInit, OnDestroy {
     return null;
   }
 
-  handleNext(): void {
-    this.hasAttemptedNext = true;
-    this.validateForm();
-    
-    if (this.isFormValid) {
-      // Navigate to advisor terms page
-      this.router.navigate(['/advisor-terms']);
-    }
-  }
-
-  handleBack(): void {
-    this.router.navigate(['/']);
-  }
-
-  handleExit(): void {
-    if (confirm('Are you sure you want to exit?')) {
-      this.router.navigate(['/']);
-    }
+  updateAnswers(answers: { [key: string]: string | string[] }): void {
+    this.answers = { ...answers };
   }
 
   private checkCrossOverValidation(): void {
@@ -190,9 +170,5 @@ export class PageComponent implements OnInit, OnDestroy {
       .subscribe((messages: string[]) => {
         this.crossOverMessages = messages;
       });
-  }
-
-  onPrefillSelected(showContent: boolean) {
-    this.showPageContent = showContent;
   }
 }
