@@ -1,90 +1,100 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { PrefillService } from '../services/prefill.service';
+import { MockService, Customer, Product } from '../services/mock.service';
+import { NgFor, NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-welcome',
   standalone: true,
-  template: `
-    <div class="welcome-container">
-      <h1>Welcome to the Setup Wizard</h1>
-      <p>This wizard will help you configure your new device.</p>
-      
-      <div class="button-group">
-        <button (click)="startWizard()" class="start-button">
-          Start Setup
-        </button>
-        
-        <button (click)="startWithPrefill()" class="prefill-button">
-          Start with Sample Data
-        </button>
-      </div>
-    </div>
-  `,
-  styles: [`
-    .welcome-container {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 2rem;
-      text-align: center;
-    }
-
-    h1 {
-      color: #2c3e50;
-      margin-bottom: 1rem;
-    }
-
-    p {
-      color: #7f8c8d;
-      margin-bottom: 2rem;
-    }
-
-    .button-group {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    .start-button, .prefill-button {
-      padding: 1rem 2rem;
-      border: none;
-      border-radius: 4px;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
-    }
-
-    .start-button {
-      background-color: #3498db;
-      color: white;
-
-      &:hover {
-        background-color: #2980b9;
-      }
-    }
-
-    .prefill-button {
-      background-color: #2ecc71;
-      color: white;
-
-      &:hover {
-        background-color: #27ae60;
-      }
-    }
-  `]
+  imports: [NgFor, NgIf],
+  templateUrl: './welcome.component.html',
+  styleUrls: ['./welcome.component.scss']
 })
-export class WelcomeComponent {
+export class WelcomeComponent implements OnInit {
+  customer: Customer | null = null;
+  isLoading: boolean = true;
+
   constructor(
     private router: Router,
-    private prefillService: PrefillService
+    private prefillService: PrefillService,
+    private mockService: MockService
   ) {}
+
+  ngOnInit() {
+    this.loadCustomerData();
+  }
+
+  loadCustomerData() {
+    this.isLoading = true;
+    this.mockService.getCustomerData().subscribe({
+      next: (data) => {
+        this.customer = data;
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error loading customer data:', error);
+        this.isLoading = false;
+      }
+    });
+  }
 
   startWizard() {
     this.prefillService.clearAnswers();
     this.router.navigate(['/page', 'product-selection']);
   }
 
-  startWithPrefill() {
+  applySampleData(product: Product) {
+    // Clear any existing answers
+    this.prefillService.clearAnswers();
+    
+    // Set up the prefill data based on the selected product
+    const prefillData = {
+      'product-selection': {
+        'product-type': product.type,
+        'purchase-state': product.state,
+        'full-renewal': 'Yes',
+        'adding-money': 'No',
+        'lan-check': 'No',
+        'safe-sell-check': 'No'
+      },
+      'customer-details': {
+        'customer-name': this.customer?.name || '',
+        'customer-email': this.customer?.email || '',
+        'customer-phone': this.customer?.phone || ''
+      },
+      'technical-questions': {
+        'os-type': product.type.toLowerCase().includes('laptop') ? 'windows' : 
+                  product.type.toLowerCase().includes('phone') ? 'ios' : 'other',
+        'os-version': product.type.toLowerCase().includes('laptop') ? 'Windows 11' : 
+                     product.type.toLowerCase().includes('phone') ? 'iOS 16' : 'N/A',
+        'ram-size': product.type.toLowerCase().includes('laptop') ? '16GB' : 
+                   product.type.toLowerCase().includes('phone') ? '8GB' : 'N/A',
+        'storage-type': 'SSD',
+        'storage-size': product.type.toLowerCase().includes('laptop') ? '512GB' : 
+                       product.type.toLowerCase().includes('phone') ? '256GB' : 'N/A'
+      }
+    };
+
+    // Set the prefill data
+    Object.entries(prefillData).forEach(([pageId, pageAnswers]) => {
+      Object.entries(pageAnswers).forEach(([questionId, answer]) => {
+        this.prefillService.setAnswer(questionId, answer);
+      });
+    });
+
+    // Navigate to the product selection page
     this.router.navigate(['/page', 'product-selection', 'prefill']);
+  }
+
+  getStatusClass(status: string): string {
+    switch (status.toLowerCase()) {
+      case 'active':
+        return 'status-active';
+      case 'pending':
+        return 'status-pending';
+      default:
+        return 'status-default';
+    }
   }
 }
