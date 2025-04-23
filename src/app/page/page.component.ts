@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { PAGES, Page, Question, VisibilityCondition } from './../page.data';
+import { PAGES, Page, Question, VisibilityCondition, Card } from './../page.data';
 import { PrefillService } from '../services/prefill.service';
 import { PageContentComponent } from './page-content/page-content.component';
 import { AlertBarComponent } from './alert-bar/alert-bar.component';
@@ -49,6 +49,11 @@ export class PageComponent implements OnInit, OnDestroy {
       const pageId = params['title'];
       this.isPrefillMode = this.router.url.includes('/prefill');
       this.currentPageData = PAGES.find(page => page.id === pageId) || null;
+      
+      // Initialize currentQuestions
+      if (this.currentPageData?.cards) {
+        this.currentQuestions = this.currentPageData.cards.flatMap(card => card.questions);
+      }
       
       if (this.isPrefillMode) {
         this.answers = this.prefillService.getAnswers();
@@ -125,9 +130,16 @@ export class PageComponent implements OnInit, OnDestroy {
     }
 
     let hasAnyValidationErrors = false;
+    console.log('Current answers:', this.answers);
 
     this.currentPageData.cards.forEach(card => {
+      console.log('Checking card:', card.id, 'Visible:', this.isCardVisible(card));
+      if (!this.isCardVisible(card)) return; // Skip hidden cards
+      
       card.questions.forEach(question => {
+        console.log('Checking question:', question.id, 'Visible:', this.isQuestionVisible(question));
+        if (!this.isQuestionVisible(question)) return; // Skip hidden questions
+        
         if (question.required) {
           const answer = this.answers[question.id];
           const hasAnswer = answer !== undefined && answer !== null && answer !== '';
@@ -135,19 +147,30 @@ export class PageComponent implements OnInit, OnDestroy {
           this.validationErrors[question.id] = !hasAnswer;
           
           if (!hasAnswer) {
+            console.log('Missing answer for required question:', question.id);
             hasAnyValidationErrors = true;
           }
         }
       });
     });
 
-    const allRequiredQuestionsAnswered = this.currentPageData.cards.every(card =>
-      card.questions.every(question => {
+    const allRequiredQuestionsAnswered = this.currentPageData.cards.every(card => {
+      if (!this.isCardVisible(card)) return true; // Skip hidden cards
+      
+      return card.questions.every(question => {
+        if (!this.isQuestionVisible(question)) return true; // Skip hidden questions
         if (!question.required) return true;
+        
         const answer = this.answers[question.id];
         return answer !== undefined && answer !== null && answer !== '';
-      })
-    );
+      });
+    });
+
+    console.log('Validation results:', {
+      hasAnyValidationErrors,
+      crossOverMessages: this.crossOverMessages,
+      allRequiredQuestionsAnswered
+    });
 
     return !hasAnyValidationErrors && this.crossOverMessages.length === 0 && allRequiredQuestionsAnswered;
   }
@@ -171,11 +194,43 @@ export class PageComponent implements OnInit, OnDestroy {
 
     // Check all visibility conditions
     return question.visibilityConditions.every((condition: VisibilityCondition) => {
-      const dependentQuestion = this.currentQuestions.find((q: Question) => q.id === condition.questionId);
-      if (!dependentQuestion) return true;
+      const dependentValue = this.answers[condition.questionId];
+      // Return false if the dependent question hasn't been answered yet
+      if (dependentValue === undefined || dependentValue === null || dependentValue === '') {
+        return false;
+      }
 
-      const dependentValue = this.form.get(condition.questionId)?.value;
-      if (dependentValue === undefined || dependentValue === null) return false;
+      switch (condition.operator) {
+        case 'equals':
+          return dependentValue === condition.expectedValue;
+        case 'notEquals':
+          return dependentValue !== condition.expectedValue;
+        case 'contains':
+          return String(dependentValue).includes(String(condition.expectedValue));
+        case 'notContains':
+          return !String(dependentValue).includes(String(condition.expectedValue));
+        case 'greaterThan':
+          return Number(dependentValue) > Number(condition.expectedValue);
+        case 'lessThan':
+          return Number(dependentValue) < Number(condition.expectedValue);
+        default:
+          return dependentValue === condition.expectedValue;
+      }
+    });
+  }
+
+  isCardVisible(card: Card): boolean {
+    if (!card.visibilityConditions) {
+      return true;
+    }
+
+    // Check all visibility conditions
+    return card.visibilityConditions.every((condition: VisibilityCondition) => {
+      const dependentValue = this.answers[condition.questionId];
+      // Return false if the dependent question hasn't been answered yet
+      if (dependentValue === undefined || dependentValue === null || dependentValue === '') {
+        return false;
+      }
 
       switch (condition.operator) {
         case 'equals':
