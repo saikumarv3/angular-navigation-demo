@@ -109,28 +109,6 @@ tr:hover {
   background-color: #f8f9fa;
 }
 
-.status-active, .status-pending, .status-default {
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  font-weight: 500;
-}
-
-.status-active {
-  background-color: #d4edda;
-  color: #155724;
-}
-
-.status-pending {
-  background-color: #fff3cd;
-  color: #856404;
-}
-
-.status-default {
-  background-color: #f8f9fa;
-  color: #495057;
-}
-
 .apply-button {
   padding: 0.5rem 1rem;
   border: none;

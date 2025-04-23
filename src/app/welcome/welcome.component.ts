@@ -53,7 +53,7 @@ export class WelcomeComponent implements OnInit {
       'product-selection': {
         'product-type': product.type,
         'purchase-state': product.state,
-        'full-renewal': 'Yes',
+        'full-renewal': 'No',
         'adding-money': 'No',
         'lan-check': 'No',
         'safe-sell-check': 'No'
@@ -85,16 +85,5 @@ export class WelcomeComponent implements OnInit {
 
     // Navigate to the product selection page
     this.router.navigate(['/page', 'product-selection', 'prefill']);
-  }
-
-  getStatusClass(status: string): string {
-    switch (status.toLowerCase()) {
-      case 'active':
-        return 'status-active';
-      case 'pending':
-        return 'status-pending';
-      default:
-        return 'status-default';
-    }
   }
 }

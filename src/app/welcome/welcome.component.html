@@ -27,10 +27,8 @@
           <tr>
             <th>Product Type</th>
             <th>State</th>
-            <th>Status</th>
             <th>Last Renewal</th>
             <th>Next Renewal</th>
-            <th>Description</th>
             <th>Action</th>
           </tr>
         </thead>
@@ -38,14 +36,8 @@
           <tr *ngFor="let product of customer?.products">
             <td>{{ product.type }}</td>
             <td>{{ product.state }}</td>
-            <td>
-              <span [class]="getStatusClass(product.status)">
-                {{ product.status }}
-              </span>
-            </td>
             <td>{{ product.lastRenewalDate }}</td>
             <td>{{ product.nextRenewalDate }}</td>
-            <td>{{ product.description }}</td>
             <td>
               <button (click)="applySampleData(product)" class="apply-button">
                 Manage
