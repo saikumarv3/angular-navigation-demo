@@ -48,6 +48,11 @@ export class WelcomeComponent implements OnInit {
     });
   }
 
+  startManualEntry() {
+    this.prefillService.clearAnswers();
+    this.router.navigate(['/page', 'product-selection']);
+  }
+
   applySampleData(product: Product) {
     this.prefillService.clearAnswers();
     

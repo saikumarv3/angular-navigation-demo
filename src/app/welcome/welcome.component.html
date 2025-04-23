@@ -13,6 +13,12 @@
   <div *ngIf="!isLoading && customer" class="customer-container">
     <h1>Welcome, {{ customer.name }}</h1>
     
+    <div class="button-group">
+      <button (click)="startManualEntry()" class="manual-entry-btn">
+        Start Manual Entry
+      </button>
+    </div>
+    
     <div class="products-container">
       <h2>Your Products</h2>
       <table class="products-table">
