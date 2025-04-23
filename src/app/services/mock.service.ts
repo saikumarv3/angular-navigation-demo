@@ -1,66 +1,89 @@
 import { Injectable } from '@angular/core';
-import { delay, of } from 'rxjs';
-
-export interface Product {
-  id: number;
-  type: string;
-  state: string;
-  status: string;
-  lastRenewalDate: string;
-  nextRenewalDate: string;
-  description: string;
-}
+import { Observable, of } from 'rxjs';
 
 export interface Customer {
-  id: number;
+  id: string;
   name: string;
   email: string;
   phone: string;
-  products: Product[];
+}
+
+export interface Product {
+  id: string;
+  type: string;
+  state: string;
+  lastRenewalDate: string;
+  nextRenewalDate: string;
+  prefillData: {
+    fullRenewal: string;
+    addingMoney: string;
+    lanCheck: string;
+    safeSellCheck: string;
+  };
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class MockService {
-  private mockData: Customer = {
-    id: 1,
-    name: 'John Smith',
-    email: 'john.smith@example.com',
-    phone: '+1 234-567-8900',
-    products: [
-      {
-        id: 1,
-        type: 'Laptop',
-        state: 'California',
-        status: 'Active',
-        lastRenewalDate: '2023-01-15',
-        nextRenewalDate: '2024-01-15',
-        description: 'Dell XPS 15, Windows 11, 16GB RAM, 512GB SSD'
-      },
-      {
-        id: 2,
-        type: 'Phone',
-        state: 'New York',
-        status: 'Active',
-        lastRenewalDate: '2023-03-20',
-        nextRenewalDate: '2024-03-20',
-        description: 'iPhone 14 Pro, iOS 16, 256GB storage'
-      },
-      {
-        id: 3,
-        type: 'Home',
-        state: 'California',
-        status: 'Pending',
-        lastRenewalDate: '2023-06-10',
-        nextRenewalDate: '2024-06-10',
-        description: 'Home security system with cameras and smart locks'
-      }
-    ]
+  private mockCustomer: Customer = {
+    id: '1',
+    name: 'John Doe',
+    email: 'john.doe@example.com',
+    phone: '555-123-4567'
   };
 
-  getCustomerData() {
-    // Simulate API call with delay
-    return of(this.mockData).pipe(delay(500));
+  private mockProducts: Product[] = [
+    {
+      id: '1',
+      type: 'Laptop',
+      state: 'CA',
+      lastRenewalDate: '2023-01-01',
+      nextRenewalDate: '2024-01-01',
+      prefillData: {
+        fullRenewal: 'No',
+        addingMoney: 'No',
+        lanCheck: 'Yes',
+        safeSellCheck: 'Yes'
+      }
+    },
+    {
+      id: '2',
+      type: 'Phone',
+      state: 'NY',
+      lastRenewalDate: '2023-02-01',
+      nextRenewalDate: '2024-02-01',
+      prefillData: {
+        fullRenewal: 'Yes',
+        addingMoney: 'No',
+        lanCheck: 'No',
+        safeSellCheck: 'Yes'
+      }
+    },
+    {
+      id: '3',
+      type: 'Home',
+      state: 'TX',
+      lastRenewalDate: '2023-03-01',
+      nextRenewalDate: '2024-03-01',
+      prefillData: {
+        fullRenewal: 'Yes',
+        addingMoney: 'No',
+        lanCheck: 'Yes',
+        safeSellCheck: 'No'
+      }
+    }
+  ];
+
+  getCustomerData(): Observable<{ customer: Customer; products: Product[] }> {
+    return of({
+      customer: this.mockCustomer,
+      products: this.mockProducts
+    });
+  }
+
+  getProductById(id: string): Observable<Product | undefined> {
+    const product = this.mockProducts.find(p => p.id === id);
+    return of(product);
   }
 } 

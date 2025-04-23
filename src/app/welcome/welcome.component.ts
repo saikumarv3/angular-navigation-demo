@@ -16,6 +16,7 @@ import { AlertBarComponent } from '../page/alert-bar/alert-bar.component';
 })
 export class WelcomeComponent implements OnInit {
   customer: Customer | null = null;
+  products: Product[] = [];
   isLoading: boolean = true;
   answers: { [key: string]: string | string[] } = {};
   crossOverMessages: string[] = [];
@@ -36,7 +37,8 @@ export class WelcomeComponent implements OnInit {
     this.isLoading = true;
     this.mockService.getCustomerData().subscribe({
       next: (data) => {
-        this.customer = data;
+        this.customer = data.customer;
+        this.products = data.products;
         this.isLoading = false;
       },
       error: (error) => {
@@ -46,44 +48,25 @@ export class WelcomeComponent implements OnInit {
     });
   }
 
-  startWizard() {
-    this.prefillService.clearAnswers();
-    this.router.navigate(['/page', 'product-selection']);
-  }
-
   applySampleData(product: Product) {
-    // Clear any existing answers
     this.prefillService.clearAnswers();
     
-    // Set up the prefill data based on the selected product
     const prefillData = {
       'product-selection': {
         'product-type': product.type,
         'purchase-state': product.state,
-        'full-renewal': 'No',
-        'adding-money': 'No',
-        'lan-check': 'No',
-        'safe-sell-check': 'No'
+        'full-renewal': product.prefillData.fullRenewal,
+        'adding-money': product.prefillData.addingMoney,
+        'lan-check': product.prefillData.lanCheck,
+        'safe-sell-check': product.prefillData.safeSellCheck
       },
       'customer-details': {
         'customer-name': this.customer?.name || '',
         'customer-email': this.customer?.email || '',
         'customer-phone': this.customer?.phone || ''
-      },
-      'technical-questions': {
-        'os-type': product.type.toLowerCase().includes('laptop') ? 'windows' : 
-                  product.type.toLowerCase().includes('phone') ? 'ios' : 'other',
-        'os-version': product.type.toLowerCase().includes('laptop') ? 'Windows 11' : 
-                     product.type.toLowerCase().includes('phone') ? 'iOS 16' : 'N/A',
-        'ram-size': product.type.toLowerCase().includes('laptop') ? '16GB' : 
-                   product.type.toLowerCase().includes('phone') ? '8GB' : 'N/A',
-        'storage-type': 'SSD',
-        'storage-size': product.type.toLowerCase().includes('laptop') ? '512GB' : 
-                       product.type.toLowerCase().includes('phone') ? '256GB' : 'N/A'
       }
     };
 
-    // Set the prefill data
     Object.entries(prefillData).forEach(([pageId, pageAnswers]) => {
       Object.entries(pageAnswers).forEach(([questionId, answer]) => {
         this.prefillService.setAnswer(questionId, answer);
@@ -100,7 +83,6 @@ export class WelcomeComponent implements OnInit {
         next: (messages: string[]) => {
           this.crossOverMessages = messages;
           this.showAlert = messages.length > 0;
-          console.log('Cross-over messages:', this.crossOverMessages);
           
           if (messages.length === 0) {
             this.router.navigate(['/page', 'product-selection', 'prefill']);
