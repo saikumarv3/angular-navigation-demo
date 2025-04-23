@@ -1,6 +1,6 @@
 // Question Types
 export type QuestionType = 'text' | 'radio' | 'checkbox' | 'dropdown' | 'heading' | 'submit' | 'input';
-export type LayoutType = 'full' | 'half' | 'quarter' | 'third';
+export type LayoutType = "full" | "half";
 
 // Validation Rules
 export interface ValidationRule {
@@ -16,20 +16,25 @@ export interface ValidationRule {
 export interface VisibilityCondition {
   questionId: string;
   expectedValue: any;
-  operator?: 'equals' | 'notEquals' | 'contains' | 'greaterThan' | 'lessThan';
+  operator?: 'equals' | 'notEquals' | 'contains' | 'notContains' | 'greaterThan' | 'lessThan';
+}
+
+interface BaseQuestion {
+  id: string;
+  type: QuestionType;
+  label: string;
+  required?: boolean;
+  errorMessage?: string;
+  layout?: 'full' | 'half';
+  visibilityConditions?: VisibilityCondition[];  // Array of visibility conditions
+  validation?: ValidationRule[];
 }
 
 // Question Interface
-export interface Question {
-  id: string;              // Unique identifier for the question
-  type: QuestionType;      // Type of question (text, email, etc.)
-  label: string;           // Question text shown to user
+export interface Question extends BaseQuestion {
   subheading?: string;     // Optional subheading for the question
-  required: boolean;       // Whether the question must be answered
-  validation?: ValidationRule[];  // Rules for validating the answer
   options?: readonly string[];    // Available options for dropdown/radio/checkbox
   prefillKey?: string;     // Key to use for pre-filling the question
-  visibilityCondition?: VisibilityCondition;  // When to show the question
   defaultValue?: any;      // Default value for the question
   layout?: LayoutType;     // How much space the question takes
   placeholder?: string;    // Hint text inside the input
@@ -41,6 +46,7 @@ export interface Card {
   id: string;
   title: string;
   questions: Question[];
+  visibilityConditions?: VisibilityCondition[];  // Array of visibility conditions for the card
 }
 
 // Page Interface
@@ -107,6 +113,32 @@ export const PAGES: Page[] = [
             ]
           },
           {
+            id: 'is-student',
+            type: 'radio',
+            label: 'Are you a student?',
+            required: true,
+            layout: 'half',
+            options: ['Yes', 'No'],
+            visibilityConditions: [
+              {
+                questionId: 'product-type',
+                expectedValue: 'Laptop',
+                operator: 'equals'
+              },
+              {
+                questionId: 'full-renewal',
+                expectedValue: 'Yes',
+                operator: 'equals'
+              },
+              {
+                questionId: 'purchase-state',
+                expectedValue: 'Alabama',
+                operator: 'equals'
+              }
+            ]
+          },
+         
+          {
             id: 'nickname',
             type: 'text',
             label: 'Enter a nickname for this product',
@@ -153,6 +185,27 @@ export const PAGES: Page[] = [
                 message: 'Please select whether the client is adding money'
               }
             ]
+          }
+        ]
+      },
+      {
+        id: 'college-student',
+        title: 'college student?',
+        visibilityConditions: [
+          {
+            questionId: 'is-student',
+            expectedValue: 'Yes',
+            operator: 'equals'
+          }
+        ],
+        questions: [
+          {
+            id: 'is-stunt',
+            type: 'radio',
+            label: 'Aare you are standford college student?',
+            required: true,
+            layout: 'half',
+            options: ['Yes', 'No']
           }
         ]
       }

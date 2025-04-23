@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NavigationButtonsComponent } from '../navigation-buttons/navigation-buttons.component';
-import { Page, Question, ValidationRule } from '../../page.data';
+import { Page, Question, ValidationRule, VisibilityCondition, Card } from '../../page.data';
 
 @Component({
   selector: 'app-page-content',
@@ -93,26 +93,71 @@ export class PageContentComponent {
   }
 
   isQuestionVisible(question: Question): boolean {
-    if (!question.visibilityCondition) {
+    if (!question.visibilityConditions) {
       return true;
     }
 
-    const { questionId, expectedValue, operator = 'equals' } = question.visibilityCondition;
-    const answer = this.answers[questionId];
+    // Check all visibility conditions
+    return question.visibilityConditions.every((condition: VisibilityCondition) => {
+      if (!this.currentPageData?.cards) return true;
+      
+      const dependentQuestion = this.currentPageData.cards
+        .flatMap(card => card.questions)
+        .find((q: Question) => q.id === condition.questionId);
+      
+      if (!dependentQuestion) return true;
 
-    switch (operator) {
-      case 'equals':
-        return answer === expectedValue;
-      case 'notEquals':
-        return answer !== expectedValue;
-      case 'contains':
-        return Array.isArray(answer) ? answer.includes(expectedValue) : false;
-      case 'greaterThan':
-        return typeof answer === 'number' && typeof expectedValue === 'number' && answer > expectedValue;
-      case 'lessThan':
-        return typeof answer === 'number' && typeof expectedValue === 'number' && answer < expectedValue;
-      default:
-        return true;
+      const dependentValue = this.answers[condition.questionId];
+      if (dependentValue === undefined || dependentValue === null) return false;
+
+      switch (condition.operator) {
+        case 'equals':
+          return dependentValue === condition.expectedValue;
+        case 'notEquals':
+          return dependentValue !== condition.expectedValue;
+        case 'contains':
+          return String(dependentValue).includes(String(condition.expectedValue));
+        case 'notContains':
+          return !String(dependentValue).includes(String(condition.expectedValue));
+        case 'greaterThan':
+          return Number(dependentValue) > Number(condition.expectedValue);
+        case 'lessThan':
+          return Number(dependentValue) < Number(condition.expectedValue);
+        default:
+          return dependentValue === condition.expectedValue;
+      }
+    });
+  }
+
+  isCardVisible(card: Card): boolean {
+    if (!card.visibilityConditions) {
+      return true;
     }
+
+    // Check all visibility conditions
+    return card.visibilityConditions.every((condition: VisibilityCondition) => {
+      const dependentValue = this.answers[condition.questionId];
+      // Return false if the dependent question hasn't been answered yet
+      if (dependentValue === undefined || dependentValue === null || dependentValue === '') {
+        return false;
+      }
+
+      switch (condition.operator) {
+        case 'equals':
+          return dependentValue === condition.expectedValue;
+        case 'notEquals':
+          return dependentValue !== condition.expectedValue;
+        case 'contains':
+          return String(dependentValue).includes(String(condition.expectedValue));
+        case 'notContains':
+          return !String(dependentValue).includes(String(condition.expectedValue));
+        case 'greaterThan':
+          return Number(dependentValue) > Number(condition.expectedValue);
+        case 'lessThan':
+          return Number(dependentValue) < Number(condition.expectedValue);
+        default:
+          return dependentValue === condition.expectedValue;
+      }
+    });
   }
 } 

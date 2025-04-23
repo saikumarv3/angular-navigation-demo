@@ -3,11 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { PAGES, Page } from './../page.data';
+import { PAGES, Page, Question, VisibilityCondition } from './../page.data';
 import { PrefillService } from '../services/prefill.service';
 import { PageContentComponent } from './page-content/page-content.component';
 import { AlertBarComponent } from './alert-bar/alert-bar.component';
 import { CrossOverValidationService } from '../services/cross-over-validation.service';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-page',
@@ -25,13 +28,21 @@ export class PageComponent implements OnInit, OnDestroy {
   isPrefillMode = false;
   crossOverMessages: string[] = [];
   hasAttemptedNext = false;
+  currentPageIndex = 0;
+  currentPage = PAGES[0];
+  currentQuestions: Question[] = [];
+  form: FormGroup;
+  private destroy$ = new Subject<void>();
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private prefillService: PrefillService,
-    private crossOverValidationService: CrossOverValidationService
-  ) {}
+    private crossOverValidationService: CrossOverValidationService,
+    private fb: FormBuilder
+  ) {
+    this.form = this.fb.group({});
+  }
 
   ngOnInit() {
     this.route.params.subscribe(params => {
@@ -151,6 +162,38 @@ export class PageComponent implements OnInit, OnDestroy {
       const answer = this.answers[questionId];
       this.validationErrors[questionId] = !answer || answer === '';
     }
+  }
+
+  isQuestionVisible(question: Question): boolean {
+    if (!question.visibilityConditions) {
+      return true;
+    }
+
+    // Check all visibility conditions
+    return question.visibilityConditions.every((condition: VisibilityCondition) => {
+      const dependentQuestion = this.currentQuestions.find((q: Question) => q.id === condition.questionId);
+      if (!dependentQuestion) return true;
+
+      const dependentValue = this.form.get(condition.questionId)?.value;
+      if (dependentValue === undefined || dependentValue === null) return false;
+
+      switch (condition.operator) {
+        case 'equals':
+          return dependentValue === condition.expectedValue;
+        case 'notEquals':
+          return dependentValue !== condition.expectedValue;
+        case 'contains':
+          return String(dependentValue).includes(String(condition.expectedValue));
+        case 'notContains':
+          return !String(dependentValue).includes(String(condition.expectedValue));
+        case 'greaterThan':
+          return Number(dependentValue) > Number(condition.expectedValue);
+        case 'lessThan':
+          return Number(dependentValue) < Number(condition.expectedValue);
+        default:
+          return dependentValue === condition.expectedValue;
+      }
+    });
   }
 
   ngOnDestroy() {
