@@ -64,11 +64,6 @@ export class WelcomeComponent implements OnInit {
         'adding-money': product.prefillData.addingMoney,
         'lan-check': product.prefillData.lanCheck,
         'safe-sell-check': product.prefillData.safeSellCheck
-      },
-      'customer-details': {
-        'customer-name': this.customer?.name || '',
-        'customer-email': this.customer?.email || '',
-        'customer-phone': this.customer?.phone || ''
       }
     };
 
