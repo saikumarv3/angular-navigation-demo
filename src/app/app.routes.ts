@@ -7,5 +7,6 @@ export const routes: Routes = [
   { path: '', redirectTo: 'welcome', pathMatch: 'full' },
   { path: 'welcome', component: WelcomeComponent },
   { path: 'page/:title', component: PageComponent },
+  { path: 'page/:title/prefill', component: PageComponent },
   { path: 'success', component: SuccessComponent }
 ];
