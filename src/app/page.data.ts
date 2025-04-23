@@ -1,42 +1,40 @@
 // Question Types
-export type QuestionType = 'radio' | 'text' | 'checkbox' | 'dropdown';
+export type QuestionType = 'text' | 'radio' | 'checkbox' | 'dropdown' | 'heading' | 'submit' | 'input';
+export type LayoutType = 'full' | 'half' | 'quarter' | 'third';
 
-// Base Question Interface
-export interface BaseQuestion {
-  id: string;
-  text: string;
-  type: QuestionType;
-  required?: boolean;
-  errorMessage?: string;
-  options?: readonly string[] | [string, string]; // Make options optional in base interface
+// Validation Rules
+export interface ValidationRule {
+  type: 'required' | 'pattern' | 'minLength' | 'maxLength' | 'custom';
+  message: string;
+  pattern?: string;
+  minLength?: number;
+  maxLength?: number;
+  customValidator?: string;
 }
 
-// Radio Question Interface
-export interface RadioQuestion extends BaseQuestion {
-  type: 'radio';
-  options: [string, string]; // Exactly two options for radio buttons
+// Visibility Conditions
+export interface VisibilityCondition {
+  questionId: string;
+  expectedValue: any;
+  operator?: 'equals' | 'notEquals' | 'contains' | 'greaterThan' | 'lessThan';
 }
 
-// Text Question Interface
-export interface TextQuestion extends BaseQuestion {
-  type: 'text';
-  options?: never; // Text questions should never have options
+// Question Interface
+export interface Question {
+  id: string;              // Unique identifier for the question
+  type: QuestionType;      // Type of question (text, email, etc.)
+  label: string;           // Question text shown to user
+  subheading?: string;     // Optional subheading for the question
+  required: boolean;       // Whether the question must be answered
+  validation?: ValidationRule[];  // Rules for validating the answer
+  options?: readonly string[];    // Available options for dropdown/radio/checkbox
+  prefillKey?: string;     // Key to use for pre-filling the question
+  visibilityCondition?: VisibilityCondition;  // When to show the question
+  defaultValue?: any;      // Default value for the question
+  layout?: LayoutType;     // How much space the question takes
+  placeholder?: string;    // Hint text inside the input
+  maxLength?: number;      // Maximum number of characters allowed
 }
-
-// Checkbox Question Interface
-export interface CheckboxQuestion extends BaseQuestion {
-  type: 'checkbox';
-  options: string[];
-}
-
-// Dropdown Question Interface
-export interface DropdownQuestion extends BaseQuestion {
-  type: 'dropdown';
-  options: readonly string[];
-}
-
-// Union type for all possible questions
-export type Question = RadioQuestion | TextQuestion | CheckboxQuestion | DropdownQuestion;
 
 // Card Interface
 export interface Card {
@@ -82,42 +80,79 @@ export const PAGES: Page[] = [
         questions: [
           {
             id: 'product-type',
-            text: 'Which product would you like to purchase?',
             type: 'dropdown',
+            label: 'Which product would you like to purchase?',
             required: true,
             options: PRODUCT_TYPE_OPTIONS,
-            errorMessage: 'Please select a product type'
+            layout: 'full',
+            validation: [
+              {
+                type: 'required',
+                message: 'Please select a product type'
+              }
+            ]
           },
           {
             id: 'purchase-state',
-            text: 'State of residence to buy',
             type: 'dropdown',
+            label: 'State of residence to buy',
             required: true,
             options: STATE_OPTIONS,
-            errorMessage: 'Please select a state'
+            layout: 'full',
+            validation: [
+              {
+                type: 'required',
+                message: 'Please select a state'
+              }
+            ]
           },
           {
             id: 'nickname',
-            text: 'Enter a nickname for this product',
             type: 'text',
+            label: 'Enter a nickname for this product',
             required: true,
-            errorMessage: 'Please enter a nickname for the product'
+            layout: 'full',
+            placeholder: 'Enter a nickname',
+            maxLength: 50,
+            validation: [
+              {
+                type: 'required',
+                message: 'Please enter a nickname for the product'
+              },
+              {
+                type: 'maxLength',
+                message: 'Nickname must be less than 50 characters',
+                maxLength: 50
+              }
+            ]
           },
           {
             id: 'full-renewal',
-            text: 'Is this a renewal of the full contract?',
             type: 'radio',
+            label: 'Is this a renewal of the full contract?',
             required: true,
-            options: ['Yes', 'No'] as [string, string],
-            errorMessage: 'Please select whether this is a full contract renewal'
+            options: ['Yes', 'No'],
+            layout: 'full',
+            validation: [
+              {
+                type: 'required',
+                message: 'Please select whether this is a full contract renewal'
+              }
+            ]
           },
           {
             id: 'adding-money',
-            text: 'Is the client adding any money when renewing?',
             type: 'radio',
+            label: 'Is the client adding any money when renewing?',
             required: true,
-            options: ['Yes', 'No'] as [string, string],
-            errorMessage: 'Please select whether the client is adding money'
+            options: ['Yes', 'No'],
+            layout: 'full',
+            validation: [
+              {
+                type: 'required',
+                message: 'Please select whether the client is adding money'
+              }
+            ]
           }
         ]
       }
@@ -133,11 +168,17 @@ export const PAGES: Page[] = [
         questions: [
           {
             id: 'advisor-terms',
-            text: 'Advisor Terms',
             type: 'radio',
+            label: 'Advisor Terms',
             required: true,
-            options: ['Yes', 'No'] as [string, string],
-            errorMessage: 'Please select whether the advisor terms have been accepted'
+            options: ['Yes', 'No'],
+            layout: 'full',
+            validation: [
+              {
+                type: 'required',
+                message: 'Please select whether the advisor terms have been accepted'
+              }
+            ]
           }
         ]
       }

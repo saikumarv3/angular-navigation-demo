@@ -52,6 +52,13 @@
     font-weight: 500;
   }
 
+  .question-subheading {
+    color: #666;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    font-weight: normal;
+  }
+
   .options-container {
     display: flex;
     flex-direction: column;
@@ -95,6 +102,23 @@
     font-size: 0.875rem;
     margin-top: 0.5rem;
   }
+}
+
+// Layout classes
+.layout-full {
+  width: 100%;
+}
+
+.layout-half {
+  width: 50%;
+}
+
+.layout-third {
+  width: 33.33%;
+}
+
+.layout-quarter {
+  width: 25%;
 }
 
 .no-cards-message {

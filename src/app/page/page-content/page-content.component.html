@@ -11,10 +11,15 @@
             <div class="questions-container" [id]="'questions-container-' + card.id">
               <div class="question" 
                    *ngFor="let question of card.questions; let questionIndex = index" 
-                   [id]="'question-' + card.id + '-' + question.id">
+                   [id]="'question-' + card.id + '-' + question.id"
+                   [class]="'layout-' + (question.layout || 'full')">
                 <div class="question-text" [id]="'question-text-' + card.id + '-' + question.id">
-                  {{ question.text }}
+                  {{ question.label }}
+                  <div *ngIf="question.subheading" class="question-subheading">
+                    {{ question.subheading }}
+                  </div>
                 </div>
+                
                 <div class="options-container" [id]="'options-container-' + card.id + '-' + question.id">
                   <ng-container [ngSwitch]="question.type">
                     <!-- Radio Options -->
@@ -43,26 +48,22 @@
                              [id]="'checkbox-option-label-' + card.id + '-' + question.id + '-' + optionIndex">
                         <input type="checkbox"
                                [id]="'checkbox-' + card.id + '-' + question.id + '-' + optionIndex"
-                               [(ngModel)]="answers[question.id]"
-                               (ngModelChange)="onCheckboxChange(question.id, option, $event)"
-                               [value]="option">
+                               [checked]="isOptionSelected(question.id, option)"
+                               (change)="onCheckboxChange(question.id, option, $any($event.target).checked)">
                         {{ option }}
                       </label>
                     </div>
 
-                    <!-- Dropdown -->
+                    <!-- Dropdown Options -->
                     <div *ngSwitchCase="'dropdown'" 
                          class="dropdown-container" 
                          [id]="'dropdown-container-' + card.id + '-' + question.id">
                       <select [id]="'dropdown-' + card.id + '-' + question.id"
                               [(ngModel)]="answers[question.id]"
                               (ngModelChange)="onAnswerChange(question.id, $event)">
-                        <option [ngValue]="''" [id]="'dropdown-default-' + card.id + '-' + question.id">
-                          Select an option
-                        </option>
-                        <option *ngFor="let option of question.options; let optionIndex = index" 
-                                [ngValue]="option"
-                                [id]="'dropdown-option-' + card.id + '-' + question.id + '-' + optionIndex">
+                        <option value="">Select an option</option>
+                        <option *ngFor="let option of question.options" 
+                                [value]="option">
                           {{ option }}
                         </option>
                       </select>
@@ -76,14 +77,16 @@
                              [id]="'text-' + card.id + '-' + question.id"
                              [(ngModel)]="answers[question.id]"
                              (ngModelChange)="onAnswerChange(question.id, $event)"
-                             (blur)="onBlur(question.id)">
+                             (blur)="onBlur(question.id)"
+                             [placeholder]="question.placeholder"
+                             [attr.maxlength]="question.maxLength || null">
                     </div>
                   </ng-container>
                 </div>
                 <div *ngIf="validationErrors[question.id]" 
                      class="error-message" 
                      [id]="'error-message-' + card.id + '-' + question.id">
-                  This field is required
+                  {{ getErrorMessage(question) }}
                 </div>
               </div>
             </div>

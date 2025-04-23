@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NavigationButtonsComponent } from '../navigation-buttons/navigation-buttons.component';
-import { Page, Question } from '../../page.data';
+import { Page, Question, ValidationRule } from '../../page.data';
 
 @Component({
   selector: 'app-page-content',
@@ -42,11 +42,11 @@ export class PageContentComponent {
     this.answerChange.emit({ questionId, answer });
   }
 
-  onCheckboxChange(questionId: string, option: string, event: any) {
+  onCheckboxChange(questionId: string, option: string, isChecked: boolean) {
     const currentAnswers = (this.answers[questionId] as string[]) || [];
     let newAnswers: string[];
     
-    if (event) {
+    if (isChecked) {
       newAnswers = [...currentAnswers, option];
     } else {
       newAnswers = currentAnswers.filter(ans => ans !== option);
@@ -77,5 +77,42 @@ export class PageContentComponent {
       return answer.includes(option);
     }
     return answer === option;
+  }
+
+  getErrorMessage(question: Question): string {
+    if (!question.validation) {
+      return 'This field is required';
+    }
+
+    const requiredRule = question.validation.find(rule => rule.type === 'required');
+    if (requiredRule) {
+      return requiredRule.message;
+    }
+
+    return 'Invalid input';
+  }
+
+  isQuestionVisible(question: Question): boolean {
+    if (!question.visibilityCondition) {
+      return true;
+    }
+
+    const { questionId, expectedValue, operator = 'equals' } = question.visibilityCondition;
+    const answer = this.answers[questionId];
+
+    switch (operator) {
+      case 'equals':
+        return answer === expectedValue;
+      case 'notEquals':
+        return answer !== expectedValue;
+      case 'contains':
+        return Array.isArray(answer) ? answer.includes(expectedValue) : false;
+      case 'greaterThan':
+        return typeof answer === 'number' && typeof expectedValue === 'number' && answer > expectedValue;
+      case 'lessThan':
+        return typeof answer === 'number' && typeof expectedValue === 'number' && answer < expectedValue;
+      default:
+        return true;
+    }
   }
 } 
