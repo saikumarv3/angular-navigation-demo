@@ -45,6 +45,7 @@ export class PageComponent implements OnInit, OnDestroy {
       
       if (this.isPrefillMode) {
         this.answers = this.prefillService.getAnswers();
+        this.checkCrossOverValidation();
       }
     });
   }

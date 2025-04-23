@@ -4,6 +4,12 @@
     <p>Loading customer data...</p>
   </div>
 
+  <app-alert-bar 
+    *ngIf="showAlert"
+    [show]="showAlert"
+    [messages]="crossOverMessages">
+  </app-alert-bar>
+
   <div *ngIf="!isLoading && customer" class="customer-container">
     <div class="customer-header">
       <h1>Welcome, {{ customer?.name }}</h1>
