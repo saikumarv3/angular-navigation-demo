@@ -5,6 +5,7 @@ import { MockService, Customer, Product } from '../services/mock.service';
 import { NgFor, NgIf } from '@angular/common';
 import { CrossOverValidationService } from '../services/cross-over-validation.service';
 import { AlertBarComponent } from '../page/alert-bar/alert-bar.component';
+import { STATE_OPTIONS } from '../page.data';
 
 @Component({
   selector: 'app-welcome',
@@ -30,11 +31,6 @@ export class WelcomeComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.loadCustomerData();
-  }
-
-  loadCustomerData() {
-    this.isLoading = true;
     this.mockService.getCustomerData().subscribe({
       next: (data) => {
         this.customer = data.customer;
@@ -56,10 +52,28 @@ export class WelcomeComponent implements OnInit {
   applySampleData(product: Product) {
     this.prefillService.clearAnswers();
     
+    // Map state code to full state name
+    const stateMap: { [key: string]: string } = {
+      'AL': 'Alabama', 'AK': 'Alaska', 'AZ': 'Arizona', 'AR': 'Arkansas', 'CA': 'California',
+      'CO': 'Colorado', 'CT': 'Connecticut', 'DE': 'Delaware', 'FL': 'Florida', 'GA': 'Georgia',
+      'HI': 'Hawaii', 'ID': 'Idaho', 'IL': 'Illinois', 'IN': 'Indiana', 'IA': 'Iowa',
+      'KS': 'Kansas', 'KY': 'Kentucky', 'LA': 'Louisiana', 'ME': 'Maine', 'MD': 'Maryland',
+      'MA': 'Massachusetts', 'MI': 'Michigan', 'MN': 'Minnesota', 'MS': 'Mississippi',
+      'MO': 'Missouri', 'MT': 'Montana', 'NE': 'Nebraska', 'NV': 'Nevada', 'NH': 'New Hampshire',
+      'NJ': 'New Jersey', 'NM': 'New Mexico', 'NY': 'New York', 'NC': 'North Carolina',
+      'ND': 'North Dakota', 'OH': 'Ohio', 'OK': 'Oklahoma', 'OR': 'Oregon', 'PA': 'Pennsylvania',
+      'RI': 'Rhode Island', 'SC': 'South Carolina', 'SD': 'South Dakota', 'TN': 'Tennessee',
+      'TX': 'Texas', 'UT': 'Utah', 'VT': 'Vermont', 'VA': 'Virginia', 'WA': 'Washington',
+      'WV': 'West Virginia', 'WI': 'Wisconsin', 'WY': 'Wyoming', 'DC': 'District of Columbia',
+      'PR': 'Puerto Rico', 'VI': 'U.S. Virgin Islands'
+    };
+
+    const fullStateName = stateMap[product.state] || product.state;
+    
     const prefillData = {
       'product-selection': {
         'product-type': product.type,
-        'purchase-state': product.state,
+        'purchase-state': fullStateName,
         'full-renewal': product.prefillData.fullRenewal,
         'adding-money': product.prefillData.addingMoney,
         'lan-check': product.prefillData.lanCheck,

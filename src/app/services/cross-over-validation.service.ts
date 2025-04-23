@@ -30,7 +30,7 @@ export class CrossOverValidationService {
       conditions: [
         { questionId: 'product-type', operator: 'equals', value: 'Home' },
         { 
-          questionId: 'states', 
+          questionId: 'purchase-state', 
           operator: 'contains', 
           value: [
             'California',
