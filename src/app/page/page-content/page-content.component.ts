@@ -2,12 +2,13 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NavigationButtonsComponent } from '../navigation-buttons/navigation-buttons.component';
+import { PrefillInfoComponent } from '../prefill-info/prefill-info.component';
 import { Page, Question, ValidationRule, VisibilityCondition, Card } from '../../page.data';
 
 @Component({
   selector: 'app-page-content',
   standalone: true,
-  imports: [CommonModule, FormsModule, NavigationButtonsComponent],
+  imports: [CommonModule, FormsModule, NavigationButtonsComponent, PrefillInfoComponent],
   templateUrl: './page-content.component.html',
   styleUrls: ['./page-content.component.scss']
 })
@@ -160,5 +161,20 @@ export class PageContentComponent {
           return dependentValue === condition.expectedValue;
       }
     });
+  }
+
+  get productType(): string {
+    const value = this.answers['product-type'];
+    return Array.isArray(value) ? value[0] : value;
+  }
+
+  get state(): string {
+    const value = this.answers['purchase-state'];
+    return Array.isArray(value) ? value[0] : value;
+  }
+
+  onNext() {
+    console.log('Current Answers:', this.answers);
+    this.next.emit();
   }
 } 
