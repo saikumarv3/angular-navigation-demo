@@ -112,6 +112,13 @@ export const PAGES: Page[] = [
               }
             ]
           },
+          
+        ]
+      },
+      {
+        id: 'additional-questions',
+        headingOfCard: 'Additional Questions',
+        questions: [
           {
             id: 'is-student',
             type: 'radio',
@@ -188,6 +195,7 @@ export const PAGES: Page[] = [
             ]
           }
         ]
+        
       },
       {
         id: 'college-student',
