@@ -44,7 +44,7 @@ export interface Question extends BaseQuestion {
 // Card Interface
 export interface Card {
   id: string;
-  title: string;
+  headingOfCard: string;  // Renamed from title
   questions: Question[];
   visibilityConditions?: VisibilityCondition[];  // Array of visibility conditions for the card
 }
@@ -82,7 +82,7 @@ export const PAGES: Page[] = [
     cards: [
       {
         id: 'renewal-details',
-        title: 'Renewal details',
+        headingOfCard: 'Renewal details',
         questions: [
           {
             id: 'product-type',
@@ -141,6 +141,7 @@ export const PAGES: Page[] = [
           {
             id: 'nickname',
             type: 'text',
+            subheading: 'NickName of Prod',
             label: 'Enter a nickname for this product',
             required: true,
             layout: 'full',
@@ -190,7 +191,7 @@ export const PAGES: Page[] = [
       },
       {
         id: 'college-student',
-        title: 'college student?',
+        headingOfCard: 'college student?',
         visibilityConditions: [
           {
             questionId: 'is-student',
@@ -217,7 +218,7 @@ export const PAGES: Page[] = [
     cards: [
       {
         id: 'advisor-terms',
-        title: 'Advisor Terms',
+        headingOfCard: 'Advisor Terms',
         questions: [
           {
             id: 'advisor-terms',

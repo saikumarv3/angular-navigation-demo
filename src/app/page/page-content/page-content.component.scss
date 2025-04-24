@@ -33,9 +33,27 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
   .card-title {
-    color: #333;
+    font-size: 1.5rem;
+    font-weight: 600;
     margin-bottom: 1.5rem;
-    font-size: 1.25rem;
+    color: #333;
+  }
+
+  .question {
+    .question-subheading {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: #555;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    .question-text {
+      font-size: 1rem;
+      font-weight: 400;
+      color: #333;
+      margin-bottom: 0.75rem;
+    }
   }
 }
 
