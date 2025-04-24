@@ -1,11 +1,24 @@
 <div class="page-container" [id]="'page-container-' + currentPageData?.id">
   <div class="page-content" [id]="'page-content-' + currentPageData?.id">
     <h1 class="page-title" [id]="'page-title-' + currentPageData?.id">{{title}}</h1>
+    
+    <!-- Prefill Information -->
+    <div *ngIf="isPrefillMode" class="prefill-info">
+      <div class="prefill-item">
+        <span class="prefill-label">Product:</span>
+        <span class="prefill-value">{{answers['product-type']}}</span>
+      </div>
+      <div class="prefill-item">
+        <span class="prefill-label">State:</span>
+        <span class="prefill-value">{{answers['purchase-state']}}</span>
+      </div>
+    </div>
+
     <div class="page-body" [id]="'page-body-' + currentPageData?.id">
       <ng-container *ngIf="currentPageData?.cards; else noCards">
         <div class="cards-container" [id]="'cards-container-' + currentPageData?.id">
           <div *ngFor="let card of currentPageData?.cards" 
-               [class.hidden]="!isCardVisible(card)" 
+               [class.hidden]="!isCardVisible(card) || (isPrefillMode && card.id === 'renewal-details')" 
                class="card" 
                [id]="'card-' + card.id">
             <h2 class="card-title" [id]="'card-title-' + card.id">{{card.headingOfCard}}</h2>

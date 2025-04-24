@@ -10,15 +10,16 @@
   <app-page-content
     [title]="currentPageData?.title || ''"
     [currentPageData]="currentPageData"
-    [answers]="answers"
-    [hasNext]="hasNext"
     [isFormValid]="isFormValid"
+    [hasNext]="hasNext"
     [validationErrors]="validationErrors"
+    [answers]="answers"
+    [isPrefillMode]="isPrefillMode"
     (next)="onNext()"
     (back)="onBack()"
-    (blur)="onBlur($event)"
+    (exit)="onExit()"
     (answerChange)="onAnswerChange($event)"
-    (exit)="onExit()">
+    (blur)="onBlur($event)">
   </app-page-content>
 
 </div> 

@@ -18,6 +18,7 @@ export class PageContentComponent {
   @Input() hasNext = true;
   @Input() validationErrors: { [key: string]: boolean } = {};
   @Input() answers: { [key: string]: string | string[] } = {};
+  @Input() isPrefillMode = false;
   @Output() next = new EventEmitter<void>();
   @Output() back = new EventEmitter<void>();
   @Output() exit = new EventEmitter<void>();

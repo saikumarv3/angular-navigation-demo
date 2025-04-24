@@ -26,6 +26,14 @@ export class CrossOverValidationService {
       message: 'Laptop products require full renewal. Please select Yes for full renewal.'
     },
     {
+      id: 'Home-no-renewal',
+      conditions: [
+        { questionId: 'product-type', operator: 'equals', value: 'Home' },
+        { questionId: 'full-renewal', operator: 'equals', value: 'No' }
+      ],
+      message: 'Home products require full renewal. Please select Yes for full renewal.'
+    },
+    {
       id: 'home-restricted-states',
       conditions: [
         { questionId: 'product-type', operator: 'equals', value: 'Home' },
@@ -35,7 +43,6 @@ export class CrossOverValidationService {
           value: [
             'California',
             'New York',
-            'Texas',
             'Florida',
             'Illinois',
             'Pennsylvania',
