@@ -1,7 +1,38 @@
 .welcome-container {
-  padding: 20px;
+  padding: 2rem;
   max-width: 1200px;
   margin: 0 auto;
+}
+
+.welcome-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+
+  .welcome-icon {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    object-fit: contain;
+    display: block;
+    color: #1976D2;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 2rem;
+    color: #1976D2;
+  }
+}
+
+.welcome-message {
+  margin-bottom: 2rem;
+  
+  p {
+    font-size: 1.2rem;
+    color: #666;
+  }
 }
 
 .loading-container {
@@ -96,5 +127,44 @@
 
   &:hover {
     background-color: #27ae60;
+  }
+}
+
+.icon-row {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+
+  .icon-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background-color: #e9ecef;
+      transform: translateY(-2px);
+    }
+
+    .feature-icon {
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
+      display: block;
+      color: #1976D2;
+    }
+
+    .icon-label {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #495057;
+    }
   }
 }

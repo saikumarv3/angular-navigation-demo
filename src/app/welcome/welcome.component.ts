@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { PrefillService } from '../services/prefill.service';
 import { MockService, Customer, Product } from '../services/mock.service';
-import { NgFor, NgIf } from '@angular/common';
+import { NgFor, NgIf, CommonModule, DatePipe } from '@angular/common';
 import { CrossOverValidationService } from '../services/cross-over-validation.service';
 import { AlertBarComponent } from '../page/alert-bar/alert-bar.component';
 import { STATE_OPTIONS } from '../page.data';
@@ -10,7 +10,7 @@ import { STATE_OPTIONS } from '../page.data';
 @Component({
   selector: 'app-welcome',
   standalone: true,
-  imports: [NgFor, NgIf, AlertBarComponent],
+  imports: [NgFor, NgIf, AlertBarComponent, CommonModule, DatePipe],
   templateUrl: './welcome.component.html',
   providers: [CrossOverValidationService],
   styleUrls: ['./welcome.component.scss']

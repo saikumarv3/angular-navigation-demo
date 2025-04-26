@@ -11,8 +11,30 @@
   </app-alert-bar>
 
   <div *ngIf="!isLoading && customer" class="customer-container">
-    <h1>Welcome, {{ customer.name }}</h1>
+    <div class="welcome-header">
+      <img src="assets/icons/welcome-icon.svg" alt="Welcome" class="welcome-icon">
+      <h1>Welcome, {{ customer.name }}!</h1>
+    </div>
+
+    <div class="icon-row">
+      <div class="icon-item">
+        <img src="assets/icons/products-icon.svg" alt="Products" class="feature-icon">
+        <span class="icon-label">Products</span>
+      </div>
+      <div class="icon-item">
+        <img src="assets/icons/renewal-icon.svg" alt="Renewal" class="feature-icon">
+        <span class="icon-label">Renewal</span>
+      </div>
+      <div class="icon-item">
+        <img src="assets/icons/state-icon.svg" alt="State" class="feature-icon">
+        <span class="icon-label">State</span>
+      </div>
+    </div>
     
+    <div class="welcome-message">
+      <p>Here are your current products:</p>
+    </div>
+
     <div class="button-group">
       <button (click)="startManualEntry()" class="manual-entry-btn">
         Start Manual Entry
@@ -21,28 +43,30 @@
     
     <div class="products-container">
       <h2>Your Products</h2>
-      <table class="products-table">
-        <thead>
-          <tr>
-            <th>Product Type</th>
-            <th>State</th>
-            <th>Last Renewal Date</th>
-            <th>Next Renewal Date</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let product of products">
-            <td>{{ product.type }}</td>
-            <td>{{ product.state }}</td>
-            <td>{{ product.lastRenewalDate }}</td>
-            <td>{{ product.nextRenewalDate }}</td>
-            <td>
-              <button class="manage-btn" (click)="applySampleData(product)">Manage</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="products-table-container">
+        <table class="products-table">
+          <thead>
+            <tr>
+              <th>Product Type</th>
+              <th>State</th>
+              <th>Last Renewal Date</th>
+              <th>Next Renewal Date</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let product of products">
+              <td>{{ product.type }}</td>
+              <td>{{ product.state }}</td>
+              <td>{{ product.lastRenewalDate | date }}</td>
+              <td>{{ product.nextRenewalDate | date }}</td>
+              <td>
+                <button class="manage-btn" (click)="applySampleData(product)">Manage</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>
