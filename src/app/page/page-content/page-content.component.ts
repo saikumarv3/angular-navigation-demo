@@ -152,73 +152,23 @@ export class PageContentComponent implements OnInit {
     return 'Invalid input';
   }
 
-  isQuestionVisible(question: Question): boolean {
-    if (!question.visibilityConditions) {
+  private evaluateVisibility(conditions: VisibilityCondition[] | undefined): boolean {
+    if (!conditions || conditions.length === 0) {
       return true;
     }
 
-    // Check all visibility conditions
-    return question.visibilityConditions.every((condition: VisibilityCondition) => {
-      if (!this.currentPageData?.cards) return true;
-      
-      const dependentQuestion = this.currentPageData.cards
-        .flatMap(card => card.questions)
-        .find((q: Question) => q.id === condition.questionId);
-      
-      if (!dependentQuestion) return true;
-
+    return conditions.every(condition => {
       const dependentValue = this.answers[condition.questionId];
-      if (dependentValue === undefined || dependentValue === null) return false;
-
-      switch (condition.operator) {
-        case 'equals':
-          return dependentValue === condition.expectedValue;
-        case 'notEquals':
-          return dependentValue !== condition.expectedValue;
-        case 'contains':
-          return String(dependentValue).includes(String(condition.expectedValue));
-        case 'notContains':
-          return !String(dependentValue).includes(String(condition.expectedValue));
-        case 'greaterThan':
-          return Number(dependentValue) > Number(condition.expectedValue);
-        case 'lessThan':
-          return Number(dependentValue) < Number(condition.expectedValue);
-        default:
-          return dependentValue === condition.expectedValue;
-      }
+      return this.evaluateCondition(dependentValue, condition.expectedValue, condition.operator || 'equals');
     });
   }
 
+  isQuestionVisible(question: Question): boolean {
+    return this.evaluateVisibility(question.visibilityConditions);
+  }
+
   isCardVisible(card: Card): boolean {
-    if (!card.visibilityConditions) {
-      return true;
-    }
-
-    // Check all visibility conditions
-    return card.visibilityConditions.every((condition: VisibilityCondition) => {
-      const dependentValue = this.answers[condition.questionId];
-      // Return false if the dependent question hasn't been answered yet
-      if (dependentValue === undefined || dependentValue === null || dependentValue === '') {
-        return false;
-      }
-
-      switch (condition.operator) {
-        case 'equals':
-          return dependentValue === condition.expectedValue;
-        case 'notEquals':
-          return dependentValue !== condition.expectedValue;
-        case 'contains':
-          return String(dependentValue).includes(String(condition.expectedValue));
-        case 'notContains':
-          return !String(dependentValue).includes(String(condition.expectedValue));
-        case 'greaterThan':
-          return Number(dependentValue) > Number(condition.expectedValue);
-        case 'lessThan':
-          return Number(dependentValue) < Number(condition.expectedValue);
-        default:
-          return dependentValue === condition.expectedValue;
-      }
-    });
+    return this.evaluateVisibility(card.visibilityConditions);
   }
 
   get productType(): string {
