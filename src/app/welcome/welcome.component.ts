@@ -5,7 +5,7 @@ import { MockService, Customer, Product } from '../services/mock.service';
 import { NgFor, NgIf, CommonModule, DatePipe } from '@angular/common';
 import { CrossOverValidationService } from '../services/cross-over-validation.service';
 import { AlertBarComponent } from '../page/alert-bar/alert-bar.component';
-import { STATE_OPTIONS } from '../page.data';
+import { STATE_OPTIONS, WELCOME_CONTENT } from '../page.data';
 import { SvgService } from '../services/svg.service';
 import { SafeHtml } from '@angular/platform-browser';
 
@@ -25,6 +25,7 @@ export class WelcomeComponent implements OnInit {
   crossOverMessages: string[] = [];
   showAlert: boolean = false;
   welcomeIcon: SafeHtml = '';
+  welcomeContent = WELCOME_CONTENT;
   
   constructor(
     private router: Router,

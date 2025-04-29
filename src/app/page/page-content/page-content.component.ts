@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NavigationButtonsComponent } from '../navigation-buttons/navigation-buttons.component';
@@ -12,7 +12,7 @@ import { Page, Question, ValidationRule, VisibilityCondition, Card } from '../..
   templateUrl: './page-content.component.html',
   styleUrls: ['./page-content.component.scss']
 })
-export class PageContentComponent {
+export class PageContentComponent implements OnInit {
   @Input() title: string = '';
   @Input() currentPageData: Page | null = null;
   @Input() isFormValid = true;
@@ -20,13 +20,14 @@ export class PageContentComponent {
   @Input() validationErrors: { [key: string]: boolean } = {};
   @Input() answers: { [key: string]: string | string[] } = {};
   @Input() isPrefillMode = false;
+  @Input() showErrors: boolean = false;
   @Output() next = new EventEmitter<void>();
   @Output() back = new EventEmitter<void>();
   @Output() exit = new EventEmitter<void>();
-  @Output() answerChange = new EventEmitter<{ questionId: string, answer: string | string[] }>();
+  @Output() answerChange = new EventEmitter<{ questionId: string; answer: string | string[] }>();
   @Output() blur = new EventEmitter<string>();
 
-  ngOnChanges() {
+  ngOnInit() {
     // Initialize empty answers for dropdown questions
     if (this.currentPageData?.cards) {
       this.currentPageData.cards.forEach(card => {
@@ -34,14 +35,71 @@ export class PageContentComponent {
           if (question.type === 'dropdown' && !this.answers[question.id]) {
             this.answers[question.id] = '';
           }
+          // Set default option value if condition is met
+          if (this.shouldShowDefaultOption(question)) {
+            const defaultValue = this.getDefaultOptionValue(question);
+            this.answers[question.id] = defaultValue;
+            this.answerChange.emit({ questionId: question.id, answer: defaultValue });
+          }
         });
       });
     }
   }
 
-  onAnswerChange(questionId: string, value: string | Event) {
-    const answer = typeof value === 'string' ? value : (value.target as HTMLInputElement).value;
-    this.answerChange.emit({ questionId, answer });
+  shouldShowDefaultOption(question: Question): boolean {
+    if (!question.defaultOption?.condition) return false;
+    
+    const { questionId, expectedValue, operator = 'equals' } = question.defaultOption.condition;
+    const dependentValue = this.answers[questionId];
+    
+    const shouldShow = this.evaluateCondition(dependentValue, expectedValue, operator);
+    
+    // If we should show the default option, ensure the answer is set
+    if (shouldShow && question.defaultOption?.value) {
+      this.answers[question.id] = question.defaultOption.value;
+      this.answerChange.emit({ questionId: question.id, answer: question.defaultOption.value });
+    }
+    
+    return shouldShow;
+  }
+
+  getDefaultOptionValue(question: Question): string {
+    return question.defaultOption?.value || '';
+  }
+
+  getDefaultOptionWarning(question: Question): string {
+    return question.defaultOption?.warningMessage || '';
+  }
+
+  private evaluateCondition(value: any, expectedValue: any, operator: string): boolean {
+    switch (operator) {
+      case 'equals':
+        return value === expectedValue;
+      case 'notEquals':
+        return value !== expectedValue;
+      case 'contains':
+        return Array.isArray(value) ? value.includes(expectedValue) : value?.includes(expectedValue);
+      case 'notContains':
+        return Array.isArray(value) ? !value.includes(expectedValue) : !value?.includes(expectedValue);
+      case 'greaterThan':
+        return value > expectedValue;
+      case 'lessThan':
+        return value < expectedValue;
+      default:
+        return false;
+    }
+  }
+
+  onAnswerChange(questionId: string, event: any) {
+    const value = event.target.value;
+    // For radio buttons, we need to ensure the value is set immediately
+    if (event.target.type === 'radio') {
+      this.answers[questionId] = value;
+      this.answerChange.emit({ questionId, answer: value });
+    } else {
+      this.answers[questionId] = value;
+      this.answerChange.emit({ questionId, answer: value });
+    }
   }
 
   onCheckboxChange(questionId: string, option: string, isChecked: boolean) {

@@ -5,15 +5,14 @@
 }
 
 .page-content {
+  padding: 2rem;
   max-width: 800px;
   margin: 0 auto;
-  background-color: #f5f5f5;
 }
 
 .page-title {
-  color: #333;
   margin-bottom: 2rem;
-  text-align: center;
+  color: #1976D2;
 }
 
 .page-body {
@@ -29,97 +28,76 @@
 .card {
   background-color: white;
   border-radius: 8px;
-  padding: 2rem;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
 
-  .card-title {
-    font-size: 1.5rem;
-    font-weight: 600;
-    margin-bottom: 1.5rem;
-    color: #333;
-  }
-
-  .question {
-    .question-subheading {
-      font-size: 1.1rem;
-      font-weight: 500;
-      color: #555;
-      margin-bottom: 0.5rem;
-      display: block;
-    }
-
-    .question-text {
-      font-size: 1rem;
-      font-weight: 400;
-      color: #333;
-      margin-bottom: 0.75rem;
-    }
-  }
+.card-title {
+  margin-bottom: 1.5rem;
+  color: #333;
 }
 
 .questions-container {
   display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
-.question {
-  .question-text {
-    color: #333;
-    margin-bottom: 0.5rem;
-    font-weight: 500;
-  }
+.question-container {
+  margin-bottom: 1.5rem;
+  width: 100%;
 
-  .question-subheading {
-    color: #666;
-    font-size: 0.875rem;
-    margin-top: 0.25rem;
-    font-weight: normal;
+  &.half-width {
+    width: 48%;
   }
+}
 
-  .options-container {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+.question-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.default-option-container {
+  background-color: #f8f9fa;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-top: 0.5rem;
+}
+
+.default-option-value {
+  font-weight: 500;
+  color: #1976D2;
+}
+
+.default-option-warning {
+  margin-top: 0.5rem;
+  color: #dc3545;
+  font-size: 0.875rem;
+}
+
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+
+  input[type="radio"] {
+    margin: 0;
   }
+}
 
-  .radio-option,
-  .checkbox-option {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    cursor: pointer;
-
-    input[type="radio"],
-    input[type="checkbox"] {
-      margin: 0;
-    }
-  }
-
-  .dropdown-container {
-    select {
-      width: 100%;
-      padding: 0.5rem;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      background-color: white;
-    }
-  }
-
-  .text-input {
-    input {
-      width: 100%;
-      padding: 0.5rem;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-    }
-  }
-
-  .error-message {
-    color: #dc3545;
-    font-size: 0.875rem;
-    margin-top: 0.5rem;
-  }
+.error-message {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
 }
 
 // Layout classes

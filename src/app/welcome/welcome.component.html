@@ -24,7 +24,8 @@
     </div>
     
     <div class="welcome-message">
-      <p>Here are your current products:</p>
+      <h1>{{ welcomeContent.title.replace('{{customerName}}', customer?.name || '') }}</h1>
+      <p>{{ welcomeContent.subtitle }}</p>
     </div>
 
     <div class="button-group">

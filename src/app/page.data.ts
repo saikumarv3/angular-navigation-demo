@@ -28,6 +28,15 @@ interface BaseQuestion {
   layout?: 'full' | 'half';
   visibilityConditions?: VisibilityCondition[];  // Array of visibility conditions
   validation?: ValidationRule[];
+  defaultOption?: {
+    value: string;
+    warningMessage?: string;
+    condition?: {
+      questionId: string;
+      expectedValue: any;
+      operator?: 'equals' | 'notEquals' | 'contains' | 'notContains' | 'greaterThan' | 'lessThan';
+    };
+  };
 }
 
 // Question Interface
@@ -173,10 +182,19 @@ export const PAGES: Page[] = [
             required: true,
             options: ['JCB', 'MCA'],
             layout: 'full',
+            defaultOption: {
+              value: 'JCB',
+              warningMessage: 'For Phone products, we only provide JCB services',
+              condition: {
+                questionId: 'product-type',
+                expectedValue: 'Phone',
+                operator: 'equals'
+              }
+            },
             validation: [
               {
                 type: 'required',
-                message: 'Please select whether this is a full contract renewal'
+                message: 'Please select a service'
               }
             ]
           },
@@ -261,3 +279,8 @@ export const PAGES: Page[] = [
     ]
   }
 ]; 
+
+export const WELCOME_CONTENT = {
+  title: 'Welcome {{customerName}}, please choose',
+  subtitle: 'Select a product to continue'
+}; 
