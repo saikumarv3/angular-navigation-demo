@@ -19,6 +19,7 @@ export interface Product {
     addingMoney: string;
     lanCheck: string;
     safeSellCheck: string;
+    serviceNeeded: string;
   };
 }
 
@@ -44,33 +45,36 @@ export class MockService {
         fullRenewal: 'No',
         addingMoney: 'No',
         lanCheck: 'Yes',
-        safeSellCheck: 'Yes'
+        safeSellCheck: 'Yes',
+        serviceNeeded: 'JCB'
       }
     },
     {
       id: '2',
       type: 'Phone',
       state: 'NY',
-      lastRenewalDate: '2023-02-01',
-      nextRenewalDate: '2024-02-01',
+      lastRenewalDate: '2023-02-15',
+      nextRenewalDate: '2024-02-15',
       prefillData: {
         fullRenewal: 'Yes',
-        addingMoney: 'No',
+        addingMoney: 'Yes',
         lanCheck: 'No',
-        safeSellCheck: 'Yes'
+        safeSellCheck: 'Yes',
+        serviceNeeded: 'MCA'
       }
     },
     {
       id: '3',
       type: 'Home',
       state: 'TX',
-      lastRenewalDate: '2023-03-01',
-      nextRenewalDate: '2024-03-01',
+      lastRenewalDate: '2023-03-10',
+      nextRenewalDate: '2024-03-10',
       prefillData: {
         fullRenewal: 'Yes',
         addingMoney: 'No',
         lanCheck: 'Yes',
-        safeSellCheck: 'No'
+        safeSellCheck: 'No',
+        serviceNeeded: 'JCB'
       }
     }
   ];

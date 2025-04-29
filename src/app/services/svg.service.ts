@@ -1,0 +1,40 @@
+import { Injectable } from '@angular/core';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class SvgService {
+  constructor(private sanitizer: DomSanitizer) {}
+
+  private welcomeIcon = `<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20ZM12 6C9.79 6 8 7.79 8 10C8 12.21 9.79 14 12 14C14.21 14 16 12.21 16 10C16 7.79 14.21 6 12 6ZM12 12C10.9 12 10 11.1 10 10C10 8.9 10.9 8 12 8C13.1 8 14 8.9 14 10C14 11.1 13.1 12 12 12ZM12 16C9.33 16 4 17.34 4 20V22H20V20C20 17.34 14.67 16 12 16ZM12 18C13.63 18 15.06 18.35 16 18.92V20H8V18.92C8.94 18.35 10.37 18 12 18Z" fill="currentColor"/>
+  </svg>`;
+
+  getWelcomeIcon(): SafeHtml {
+    return this.sanitizer.bypassSecurityTrustHtml(this.welcomeIcon);
+  }
+
+  isSvgString(svgString: string): boolean {
+    // Check if the string starts with <svg and ends with </svg>
+    const isSvgTag = /^<svg[\s\S]*<\/svg>$/.test(svgString.trim());
+    
+    // Check for required SVG attributes
+    const hasViewBox = /viewBox=["'][^"']*["']/.test(svgString);
+    const hasXmlns = /xmlns=["']http:\/\/www\.w3\.org\/2000\/svg["']/.test(svgString);
+    
+    // Check for at least one path or shape element
+    const hasPathOrShape = /<(path|circle|rect|ellipse|line|polygon|polyline)[\s\S]*?>/.test(svgString);
+    
+    return isSvgTag && hasViewBox && hasXmlns && hasPathOrShape;
+  }
+
+  // Example usage in component:
+  // if (this.svgService.isSvgString(someString)) {
+  //   // It's a valid SVG
+  //   this.sanitizedSvg = this.svgService.getWelcomeIcon();
+  // } else {
+  //   // It's not a valid SVG
+  //   console.error('Invalid SVG string');
+  // }
+} 

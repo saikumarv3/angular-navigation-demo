@@ -167,6 +167,20 @@ export const PAGES: Page[] = [
             ]
           },
           {
+            id: 'service-needed',
+            type: 'radio',
+            label: 'which service is needed?',
+            required: true,
+            options: ['JCB', 'MCA'],
+            layout: 'full',
+            validation: [
+              {
+                type: 'required',
+                message: 'Please select whether this is a full contract renewal'
+              }
+            ]
+          },
+          {
             id: 'full-renewal',
             type: 'radio',
             label: 'Is this a renewal of the full contract?',

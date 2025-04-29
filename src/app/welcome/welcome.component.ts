@@ -6,6 +6,8 @@ import { NgFor, NgIf, CommonModule, DatePipe } from '@angular/common';
 import { CrossOverValidationService } from '../services/cross-over-validation.service';
 import { AlertBarComponent } from '../page/alert-bar/alert-bar.component';
 import { STATE_OPTIONS } from '../page.data';
+import { SvgService } from '../services/svg.service';
+import { SafeHtml } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-welcome',
@@ -22,15 +24,28 @@ export class WelcomeComponent implements OnInit {
   answers: { [key: string]: string | string[] } = {};
   crossOverMessages: string[] = [];
   showAlert: boolean = false;
-
+  welcomeIcon: SafeHtml = '';
+  
   constructor(
     private router: Router,
     private prefillService: PrefillService,
     private mockService: MockService,
-    private crossOverValidationService: CrossOverValidationService
+    private crossOverValidationService: CrossOverValidationService,
+    private svgService: SvgService
   ) {}
 
   ngOnInit() {
+    // Get the raw SVG string from the service
+    const rawSvg = this.svgService.getWelcomeIcon().toString();
+    
+    // Validate if it's a proper SVG
+    if (this.svgService.isSvgString(rawSvg)) {
+      this.welcomeIcon = this.svgService.getWelcomeIcon();
+    } else {
+      console.error('Invalid SVG string received');
+      // You could set a default icon or handle the error here
+    }
+    
     this.mockService.getCustomerData().subscribe({
       next: (data) => {
         this.customer = data.customer;
@@ -74,6 +89,7 @@ export class WelcomeComponent implements OnInit {
       'product-selection': {
         'product-type': product.type,
         'purchase-state': fullStateName,
+        'service-needed': product.prefillData.serviceNeeded || 'JCB', // Default to JCB if not specified
         'full-renewal': product.prefillData.fullRenewal,
         'adding-money': product.prefillData.addingMoney,
         'lan-check': product.prefillData.lanCheck,

@@ -12,22 +12,14 @@
 
   <div *ngIf="!isLoading && customer" class="customer-container">
     <div class="welcome-header">
-      <img src="assets/icons/welcome-icon.svg" alt="Welcome" class="welcome-icon">
+      <div [innerHTML]="welcomeIcon" class="welcome-icon"></div>
       <h1>Welcome, {{ customer.name }}!</h1>
     </div>
 
     <div class="icon-row">
       <div class="icon-item">
-        <img src="assets/icons/products-icon.svg" alt="Products" class="feature-icon">
+        <div [innerHTML]="welcomeIcon" class="feature-icon"></div>
         <span class="icon-label">Products</span>
-      </div>
-      <div class="icon-item">
-        <img src="assets/icons/renewal-icon.svg" alt="Renewal" class="feature-icon">
-        <span class="icon-label">Renewal</span>
-      </div>
-      <div class="icon-item">
-        <img src="assets/icons/state-icon.svg" alt="State" class="feature-icon">
-        <span class="icon-label">State</span>
       </div>
     </div>
     
